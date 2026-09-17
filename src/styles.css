@@ -186,9 +186,15 @@
   text-align: center;
 }
 
+.document-title-inner {
+  display: inline-block;
+  width: max-content;
+  max-width: 100%;
+}
+
 .document-title h2 {
-  width: 235px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   border-bottom: 1px solid var(--document);
   font-size: 16px;
   font-weight: 700;
