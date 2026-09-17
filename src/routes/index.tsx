@@ -277,7 +277,7 @@ function Index() {
 
               <DocumentRow label="Untuk">
                 <ol className="document-list duties">
-                  {data.tugas.trim() ? <li>melaksanakan Tugas {data.tugas};</li> : null}
+                  {data.tugas?.trim() ? <li>melaksanakan Tugas {data.tugas};</li> : null}
                   {lines(data.duties).map((item, index) => (
                     <li key={`${item}-${index}`}>{item}</li>
                   ))}
