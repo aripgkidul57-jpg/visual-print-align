@@ -59,29 +59,37 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-paper: var(--paper);
+  --color-preview: var(--preview);
+  --color-document: var(--document);
+  --shadow-paper: 0 16px 44px oklch(0.18 0.015 255 / 18%);
+  --font-sans: Arial, Helvetica, sans-serif;
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 0.5rem;
+  --background: oklch(0.965 0.004 250);
+  --foreground: oklch(0.2 0.015 255);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.36 0.088 246);
+  --primary-foreground: oklch(0.99 0.002 250);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
   --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
+  --accent: oklch(0.94 0.012 246);
   --accent-foreground: oklch(0.208 0.042 265.755);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --border: oklch(0.885 0.012 250);
+  --input: oklch(0.82 0.016 250);
+  --ring: oklch(0.55 0.095 246);
+  --paper: oklch(1 0 0);
+  --preview: oklch(0.88 0.008 250);
+  --document: oklch(0.13 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +148,121 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+  }
+}
+
+.print-sheet {
+  box-sizing: border-box;
+  width: 794px;
+  min-height: 1123px;
+  padding: 42px 86px 62px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  line-height: 1.33;
+}
+
+.letterhead {
+  width: 274px;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.letterhead-rule {
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--document);
+}
+
+.document-title {
+  margin-top: 103px;
+  text-align: center;
+}
+
+.document-title h2 {
+  width: 235px;
+  margin: 0 auto;
+  border-bottom: 1px solid var(--document);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.document-title p { margin: 1px 0 0; }
+.document-body { margin-top: 23px; }
+
+.document-row {
+  display: grid;
+  grid-template-columns: 98px 18px minmax(0, 1fr);
+  column-gap: 9px;
+  margin-bottom: 19px;
+}
+
+.document-row p { margin: 0; }
+.document-list { margin: 0; padding-left: 25px; }
+.document-list li { padding-left: 5px; margin: 0 0 2px; }
+.recipients li { margin-bottom: 2px; }
+.recipient-name { text-decoration: underline; }
+.recipient-role { display: block; padding-left: 4px; }
+.duties li { margin-bottom: 18px; }
+
+.command-title {
+  margin: 22px 0 23px;
+  text-align: center;
+}
+
+.finished { margin: 0; }
+
+.signature-block {
+  width: 366px;
+  margin: 2px 0 0 auto;
+  text-align: center;
+}
+
+.signature-meta {
+  display: grid;
+  grid-template-columns: 150px 17px 1fr;
+  border-bottom: 1px solid var(--document);
+  padding: 0 4px 7px;
+  text-align: left;
+}
+
+.signature-meta b { font-weight: 400; }
+.signature-office { padding-top: 11px; }
+.signature-office p, .signature-name p { margin: 0; }
+.signature-office p:last-child { margin-top: 1px; }
+.signature-name { margin-top: 64px; }
+.signature-name p:first-child { display: inline-block; border-bottom: 1px solid var(--document); }
+
+.copies {
+  margin-top: -35px;
+  width: 205px;
+}
+
+.copies p { margin: 0; }
+.copies p:last-child { margin-top: 23px; border-bottom: 1px solid var(--document); }
+
+@media (max-width: 1100px) {
+  .preview-stage { margin-inline: -20px; border-radius: 0; }
+}
+
+@media (max-width: 850px) {
+  .print-sheet { transform-origin: top left; }
+  .preview-stage { display: flex; justify-content: flex-start; }
+}
+
+@media print {
+  @page { size: A4 portrait; margin: 0; }
+
+  html, body { width: 210mm; min-height: 297mm; background: var(--paper); }
+  .screen-only { display: none !important; }
+  .workspace { display: block; max-width: none; padding: 0; }
+  .preview-stage { overflow: visible; padding: 0; background: var(--paper); border-radius: 0; }
+  .print-sheet {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 11.1mm 22.8mm 16.4mm;
+    box-shadow: none;
+    print-color-adjust: exact;
   }
 }
