@@ -73,9 +73,9 @@ function buildNumber(data: Pick<LetterData, "numberPrefix" | "numberSequence" | 
   const parsed = parseIssueDate(data.issueDate);
   const month = parsed ? ROMAWI[parsed.month - 1] : "…";
   const year = parsed ? String(parsed.year) : "…";
-  const prefix = data.numberPrefix.trim();
-  const sequence = data.numberSequence.trim() || "…";
-  const suffix = data.numberSuffix.trim();
+  const prefix = (data.numberPrefix ?? "").trim();
+  const sequence = (data.numberSequence ?? "").trim() || "…";
+  const suffix = (data.numberSuffix ?? "").trim();
   const head = prefix ? `${prefix}-${sequence}` : sequence;
   return suffix ? `${head}/${month}/${year}/${suffix}` : `${head}/${month}/${year}`;
 }
@@ -112,7 +112,7 @@ const fields: Array<{
   { key: "copyTo", label: "Tembusan" },
 ];
 
-const lines = (value: string) => value.split("\n").filter((line) => line.trim());
+const lines = (value: string) => (value ?? "").split("\n").filter((line) => line.trim());
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -248,7 +248,7 @@ function Index() {
 
             <div className="document-body">
               <DocumentRow label="Pertimbangan">
-                <p>Adanya {data.tugas}.</p>
+                <p>Adanya {data.tugas ?? ""}.</p>
               </DocumentRow>
 
               <DocumentRow label="Dasar">
@@ -277,7 +277,7 @@ function Index() {
 
               <DocumentRow label="Untuk">
                 <ol className="document-list duties">
-                  {data.tugas.trim() ? <li>melaksanakan Tugas {data.tugas};</li> : null}
+                  {data.tugas?.trim() ? <li>melaksanakan Tugas {data.tugas};</li> : null}
                   {lines(data.duties).map((item, index) => (
                     <li key={`${item}-${index}`}>{item}</li>
                   ))}
