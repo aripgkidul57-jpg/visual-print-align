@@ -73,9 +73,9 @@ function buildNumber(data: Pick<LetterData, "numberPrefix" | "numberSequence" | 
   const parsed = parseIssueDate(data.issueDate);
   const month = parsed ? ROMAWI[parsed.month - 1] : "…";
   const year = parsed ? String(parsed.year) : "…";
-  const prefix = data.numberPrefix.trim();
-  const sequence = data.numberSequence.trim() || "…";
-  const suffix = data.numberSuffix.trim();
+  const prefix = (data.numberPrefix ?? "").trim();
+  const sequence = (data.numberSequence ?? "").trim() || "…";
+  const suffix = (data.numberSuffix ?? "").trim();
   const head = prefix ? `${prefix}-${sequence}` : sequence;
   return suffix ? `${head}/${month}/${year}/${suffix}` : `${head}/${month}/${year}`;
 }
