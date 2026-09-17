@@ -8,13 +8,15 @@ type LetterData = {
   agency: string;
   region: string;
   resort: string;
-  number: string;
+  numberPrefix: string;
+  numberSequence: string;
+  numberSuffix: string;
+  issueDate: string;
   consideration: string;
   bases: string;
   recipients: string;
   duties: string;
   city: string;
-  date: string;
   authority: string;
   office: string;
   signer: string;
@@ -26,7 +28,10 @@ const initialData: LetterData = {
   agency: "KEPOLISIAN NEGARA REPUBLIK INDONESIA",
   region: "DAERAH JAWA TIMUR",
   resort: "RESORT SITUBONDO",
-  number: "R/Sprin-2487/II/2016/Satintelkam",
+  numberPrefix: "R/Sprin",
+  numberSequence: "2487",
+  numberSuffix: "Satintelkam",
+  issueDate: "2016-02-21",
   consideration:
     "Adanya giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo.",
   bases:
@@ -36,13 +41,51 @@ const initialData: LetterData = {
   duties:
     "melaksanakan Tugas giat Lidik adanya Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo;\nmelaporkan hasil pelaksanaannya kepada pimpinan;\nmelaksanakan perintah ini dengan seksama dan penuh rasa tanggung jawab.",
   city: "Situbondo",
-  date: "21 Pebruari 2016",
   authority: "a.n. KEPALA KEPOLISIAN RESORT SITUBONDO",
   office: "KASAT INTELKAM",
   signer: "MOHAMAD DJUPRI",
   signerRank: "INSPEKTUR POLISI SATU NRP 68020388",
   copyTo: "Kapolres Situbondo.",
 };
+
+const ROMAWI = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+const BULAN_ID = [
+  "Januari",
+  "Pebruari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "Nopember",
+  "Desember",
+];
+
+function parseIssueDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return { year, month, day };
+}
+
+function buildNumber(data: Pick<LetterData, "numberPrefix" | "numberSequence" | "numberSuffix" | "issueDate">) {
+  const parsed = parseIssueDate(data.issueDate);
+  const month = parsed ? ROMAWI[parsed.month - 1] : "…";
+  const year = parsed ? String(parsed.year) : "…";
+  const prefix = data.numberPrefix.trim();
+  const sequence = data.numberSequence.trim() || "…";
+  const suffix = data.numberSuffix.trim();
+  const head = prefix ? `${prefix}-${sequence}` : sequence;
+  return suffix ? `${head}/${month}/${year}/${suffix}` : `${head}/${month}/${year}`;
+}
+
+function formatTanggal(value: string) {
+  const parsed = parseIssueDate(value);
+  if (!parsed) return "…";
+  return `${parsed.day} ${BULAN_ID[parsed.month - 1]} ${parsed.year}`;
+}
 
 const fields: Array<{
   key: keyof LetterData;
@@ -53,7 +96,6 @@ const fields: Array<{
   { key: "agency", label: "Instansi" },
   { key: "region", label: "Daerah" },
   { key: "resort", label: "Kesatuan" },
-  { key: "number", label: "Nomor surat" },
   { key: "consideration", label: "Pertimbangan", multiline: true },
   { key: "bases", label: "Dasar", multiline: true, hint: "Satu butir per baris" },
   {
@@ -64,7 +106,6 @@ const fields: Array<{
   },
   { key: "duties", label: "Untuk", multiline: true, hint: "Satu butir per baris" },
   { key: "city", label: "Dikeluarkan di" },
-  { key: "date", label: "Pada tanggal" },
   { key: "authority", label: "Atas nama" },
   { key: "office", label: "Jabatan penanda tangan" },
   { key: "signer", label: "Nama penanda tangan" },
@@ -125,6 +166,48 @@ function Index() {
             <p className="mt-1 text-sm text-muted-foreground">Perubahan langsung tampil pada lembar A4.</p>
           </div>
           <div className="form-scroll space-y-4 p-5 lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto">
+            <fieldset className="space-y-3 rounded-md border border-border p-3">
+              <legend className="px-1 text-sm font-semibold">Nomor surat</legend>
+              <div className="grid grid-cols-3 gap-2">
+                <label className="block">
+                  <span className="mb-1 block text-xs font-semibold">Awalan</span>
+                  <input
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
+                    value={data.numberPrefix}
+                    onChange={(event) => update("numberPrefix", event.target.value)}
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-semibold">Nomor urut</span>
+                  <input
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
+                    inputMode="numeric"
+                    value={data.numberSequence}
+                    onChange={(event) => update("numberSequence", event.target.value)}
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-xs font-semibold">Akhiran</span>
+                  <input
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
+                    value={data.numberSuffix}
+                    onChange={(event) => update("numberSuffix", event.target.value)}
+                  />
+                </label>
+              </div>
+              <label className="block">
+                <span className="mb-1 block text-xs font-semibold">Tanggal surat</span>
+                <input
+                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
+                  type="date"
+                  value={data.issueDate}
+                  onChange={(event) => update("issueDate", event.target.value)}
+                />
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Hasil: {buildNumber(data)} — bulan Romawi dan tahun mengikuti tanggal surat.
+              </p>
+            </fieldset>
             {fields.map((field) => (
               <label className="block" key={field.key}>
                 <span className="mb-1.5 block text-sm font-semibold">{field.label}</span>
@@ -160,7 +243,7 @@ function Index() {
             <div className="document-title">
               <div className="document-title-inner">
                 <h2>SURAT PERINTAH</h2>
-                <p>Nomor : {data.number}</p>
+                <p>Nomor : {buildNumber(data)}</p>
               </div>
             </div>
 
@@ -206,7 +289,7 @@ function Index() {
               <div className="signature-block">
                 <div className="signature-meta">
                   <span>Dikeluarkan di</span><b>:</b><span>{data.city}</span>
-                  <span>Pada tanggal</span><b>:</b><span>{data.date}</span>
+                  <span>Pada tanggal</span><b>:</b><span>{formatTanggal(data.issueDate)}</span>
                 </div>
                 <div className="signature-office">
                   <p>{data.authority}</p>
