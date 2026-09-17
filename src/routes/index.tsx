@@ -201,7 +201,7 @@ function Index() {
             <div className="document-title">
               <div className="document-title-inner">
                 <h2>SURAT PERINTAH</h2>
-                <p>Nomor : {data.number}</p>
+                <p>Nomor : {buildNumber(data)}</p>
               </div>
             </div>
 
@@ -247,7 +247,7 @@ function Index() {
               <div className="signature-block">
                 <div className="signature-meta">
                   <span>Dikeluarkan di</span><b>:</b><span>{data.city}</span>
-                  <span>Pada tanggal</span><b>:</b><span>{data.date}</span>
+                  <span>Pada tanggal</span><b>:</b><span>{formatTanggal(data.issueDate)}</span>
                 </div>
                 <div className="signature-office">
                   <p>{data.authority}</p>
