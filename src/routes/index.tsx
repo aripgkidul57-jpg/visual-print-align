@@ -12,7 +12,7 @@ type LetterData = {
   numberSequence: string;
   numberSuffix: string;
   issueDate: string;
-  consideration: string;
+  tugas: string;
   bases: string;
   recipients: string;
   duties: string;
@@ -32,14 +32,13 @@ const initialData: LetterData = {
   numberSequence: "2487",
   numberSuffix: "Satintelkam",
   issueDate: "2016-02-21",
-  consideration:
-    "Adanya giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo.",
+  tugas: "giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo",
   bases:
     "Undang – Undang Negara Republik Indonesia Nomor 2 Tahun 2002 tgl 08 Januari 2002 tentang Kepolisian Negara Republik Indonesia;\nPeraturan Kepala Kepolisian Negara Republik Indonesia Nomor 15 Tahun 2007 tentang Naskah Dinas di lingkungan Kepolisian Negara Republik Indonesia;\nDisposisi Kasat Intelkam untuk Lidik dan Monitor",
   recipients:
     "AIPDA SURYANTO, SH. NRP 79120041|Ps. KANIT I INTELKAM\nBRIGADIR FAJRI WAHYUDIONO, SH. NRP 83040626|ANGGOTA UNIT I INTELKAM",
   duties:
-    "melaksanakan Tugas giat Lidik adanya Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo;\nmelaporkan hasil pelaksanaannya kepada pimpinan;\nmelaksanakan perintah ini dengan seksama dan penuh rasa tanggung jawab.",
+    "melaporkan hasil pelaksanaannya kepada pimpinan;\nmelaksanakan perintah ini dengan seksama dan penuh rasa tanggung jawab.",
   city: "Situbondo",
   authority: "a.n. KEPALA KEPOLISIAN RESORT SITUBONDO",
   office: "KASAT INTELKAM",
@@ -96,7 +95,7 @@ const fields: Array<{
   { key: "agency", label: "Instansi" },
   { key: "region", label: "Daerah" },
   { key: "resort", label: "Kesatuan" },
-  { key: "consideration", label: "Pertimbangan", multiline: true },
+  { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
   { key: "bases", label: "Dasar", multiline: true, hint: "Satu butir per baris" },
   {
     key: "recipients",
@@ -249,7 +248,7 @@ function Index() {
 
             <div className="document-body">
               <DocumentRow label="Pertimbangan">
-                <p>{data.consideration}</p>
+                <p>Adanya {data.tugas}.</p>
               </DocumentRow>
 
               <DocumentRow label="Dasar">
@@ -278,6 +277,7 @@ function Index() {
 
               <DocumentRow label="Untuk">
                 <ol className="document-list duties">
+                  {data.tugas.trim() ? <li>melaksanakan Tugas {data.tugas};</li> : null}
                   {lines(data.duties).map((item, index) => (
                     <li key={`${item}-${index}`}>{item}</li>
                   ))}
