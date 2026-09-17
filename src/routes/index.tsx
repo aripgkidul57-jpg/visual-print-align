@@ -158,8 +158,10 @@ function Index() {
             </header>
 
             <div className="document-title">
-              <h2>SURAT PERINTAH</h2>
-              <p>Nomor : {data.number}</p>
+              <div className="document-title-inner">
+                <h2>SURAT PERINTAH</h2>
+                <p>Nomor : {data.number}</p>
+              </div>
             </div>
 
             <div className="document-body">
