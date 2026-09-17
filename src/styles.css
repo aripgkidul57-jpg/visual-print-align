@@ -164,14 +164,21 @@
 }
 
 .letterhead {
-  width: 274px;
+  width: max-content;
+  max-width: 100%;
+  margin: 0;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--document);
   text-align: center;
   line-height: 1.35;
 }
 
+.letterhead > div {
+  white-space: nowrap;
+}
+
 .letterhead-rule {
-  padding-bottom: 1px;
-  border-bottom: 1px solid var(--document);
+  padding-bottom: 0;
 }
 
 .document-title {
