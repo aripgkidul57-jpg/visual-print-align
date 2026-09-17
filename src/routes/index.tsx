@@ -112,7 +112,7 @@ const fields: Array<{
   { key: "copyTo", label: "Tembusan" },
 ];
 
-const lines = (value: string) => value.split("\n").filter((line) => line.trim());
+const lines = (value: string) => (value ?? "").split("\n").filter((line) => line.trim());
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -248,7 +248,7 @@ function Index() {
 
             <div className="document-body">
               <DocumentRow label="Pertimbangan">
-                <p>Adanya {data.tugas}.</p>
+                <p>Adanya {data.tugas ?? ""}.</p>
               </DocumentRow>
 
               <DocumentRow label="Dasar">
