@@ -1,8 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+
+type Personel = {
+  nrp: string;
+  nama: string;
+  pangkat: string;
+  jabatan: string;
+};
 
 type LetterData = {
   agency: string;
@@ -14,7 +22,6 @@ type LetterData = {
   issueDate: string;
   tugas: string;
   bases: string;
-  recipients: string;
   duties: string;
   city: string;
   authority: string;
