@@ -254,11 +254,16 @@
 
 .copies {
   margin-top: -35px;
-  width: 205px;
 }
 
 .copies p { margin: 0; }
-.copies p:last-child { margin-top: 23px; border-bottom: 1px solid var(--document); }
+.copies p:last-child {
+  display: inline-block;
+  width: max-content;
+  max-width: 100%;
+  margin-top: 23px;
+  border-bottom: 1px solid var(--document);
+}
 
 @media (max-width: 1100px) {
   .preview-stage { margin-inline: -20px; border-radius: 0; }
