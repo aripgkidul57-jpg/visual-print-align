@@ -14,7 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      personel: {
+        Row: {
+          jabatan: string
+          nama: string
+          nrp: string
+          pangkat: string
+        }
+        Insert: {
+          jabatan: string
+          nama: string
+          nrp: string
+          pangkat: string
+        }
+        Update: {
+          jabatan?: string
+          nama?: string
+          nrp?: string
+          pangkat?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
