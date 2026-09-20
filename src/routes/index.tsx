@@ -250,6 +250,64 @@ function Index() {
                 Hasil: {buildNumber(data)} — bulan Romawi dan tahun mengikuti tanggal surat.
               </p>
             </fieldset>
+            <fieldset className="space-y-3 rounded-md border border-border p-3">
+              <legend className="px-1 text-sm font-semibold">Kepada (penerima perintah)</legend>
+              <p className="text-xs text-muted-foreground">
+                Centang personel yang menerima perintah. Data diambil dari database.
+              </p>
+              <div className="space-y-2">
+                {personelList.map((p) => (
+                  <label key={p.nrp} className="flex cursor-pointer items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={selectedNrp.includes(p.nrp)}
+                      onChange={() => togglePersonel(p.nrp)}
+                    />
+                    <span>
+                      <span className="font-medium">
+                        {p.pangkat} {p.nama}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
+                        NRP {p.nrp} — {p.jabatan}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <details className="rounded-md border border-dashed border-border p-3">
+                <summary className="cursor-pointer text-xs font-semibold">Tambah personel baru</summary>
+                <div className="mt-3 space-y-2">
+                  {(
+                    [
+                      ["nama", "Nama (mis. SURYANTO, SH.)"],
+                      ["pangkat", "Pangkat (mis. AIPDA)"],
+                      ["nrp", "NRP (sebagai ID)"],
+                      ["jabatan", "Jabatan"],
+                    ] as const
+                  ).map(([key, placeholder]) => (
+                    <input
+                      key={key}
+                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
+                      placeholder={placeholder}
+                      value={newPersonel[key]}
+                      onChange={(event) =>
+                        setNewPersonel((current) => ({ ...current, [key]: event.target.value }))
+                      }
+                    />
+                  ))}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    disabled={saving || !newPersonel.nrp.trim() || !newPersonel.nama.trim()}
+                    onClick={addPersonel}
+                  >
+                    {saving ? "Menyimpan…" : "Simpan personel"}
+                  </Button>
+                </div>
+              </details>
+            </fieldset>
             {fields.map((field) => (
               <label className="block" key={field.key}>
                 <span className="mb-1.5 block text-sm font-semibold">{field.label}</span>
