@@ -1,8 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Printer } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+
+type Personel = {
+  nrp: string;
+  nama: string;
+  pangkat: string;
+  jabatan: string;
+};
 
 type LetterData = {
   agency: string;
@@ -14,7 +22,6 @@ type LetterData = {
   issueDate: string;
   tugas: string;
   bases: string;
-  recipients: string;
   duties: string;
   city: string;
   authority: string;
@@ -35,8 +42,6 @@ const initialData: LetterData = {
   tugas: "giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo",
   bases:
     "Undang – Undang Negara Republik Indonesia Nomor 2 Tahun 2002 tgl 08 Januari 2002 tentang Kepolisian Negara Republik Indonesia;\nPeraturan Kepala Kepolisian Negara Republik Indonesia Nomor 15 Tahun 2007 tentang Naskah Dinas di lingkungan Kepolisian Negara Republik Indonesia;\nDisposisi Kasat Intelkam untuk Lidik dan Monitor",
-  recipients:
-    "AIPDA SURYANTO, SH. NRP 79120041|Ps. KANIT I INTELKAM\nBRIGADIR FAJRI WAHYUDIONO, SH. NRP 83040626|ANGGOTA UNIT I INTELKAM",
   duties:
     "melaporkan hasil pelaksanaannya kepada pimpinan;\nmelaksanakan perintah ini dengan seksama dan penuh rasa tanggung jawab.",
   city: "Situbondo",
@@ -97,12 +102,6 @@ const fields: Array<{
   { key: "resort", label: "Kesatuan" },
   { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
   { key: "bases", label: "Dasar", multiline: true, hint: "Satu butir per baris" },
-  {
-    key: "recipients",
-    label: "Kepada",
-    multiline: true,
-    hint: "Satu orang per baris; pisahkan nama dan jabatan dengan |",
-  },
   { key: "duties", label: "Untuk", multiline: true, hint: "Satu butir per baris" },
   { key: "city", label: "Dikeluarkan di" },
   { key: "authority", label: "Atas nama" },
@@ -136,6 +135,50 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [data, setData] = useState(initialData);
+  const [personelList, setPersonelList] = useState<Personel[]>([]);
+  const [selectedNrp, setSelectedNrp] = useState<string[]>(["79120041", "83040626"]);
+  const [newPersonel, setNewPersonel] = useState<Personel>({ nrp: "", nama: "", pangkat: "", jabatan: "" });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from("personel")
+      .select("*")
+      .order("nama")
+      .then(({ data: rows }) => {
+        if (rows) setPersonelList(rows);
+      });
+  }, []);
+
+  const selectedPersonel = selectedNrp
+    .map((nrp) => personelList.find((p) => p.nrp === nrp))
+    .filter((p): p is Personel => Boolean(p));
+
+  const togglePersonel = (nrp: string) => {
+    setSelectedNrp((current) =>
+      current.includes(nrp) ? current.filter((item) => item !== nrp) : [...current, nrp],
+    );
+  };
+
+  const addPersonel = async () => {
+    if (!newPersonel.nrp.trim() || !newPersonel.nama.trim()) return;
+    setSaving(true);
+    const row = {
+      nrp: newPersonel.nrp.trim(),
+      nama: newPersonel.nama.trim(),
+      pangkat: newPersonel.pangkat.trim(),
+      jabatan: newPersonel.jabatan.trim(),
+    };
+    const { error } = await supabase.from("personel").upsert(row);
+    setSaving(false);
+    if (error) return;
+    setPersonelList((current) => {
+      const rest = current.filter((p) => p.nrp !== row.nrp);
+      return [...rest, row].sort((a, b) => a.nama.localeCompare(b.nama));
+    });
+    setSelectedNrp((current) => (current.includes(row.nrp) ? current : [...current, row.nrp]));
+    setNewPersonel({ nrp: "", nama: "", pangkat: "", jabatan: "" });
+  };
 
   const update = (key: keyof LetterData, value: string) => {
     setData((current) => ({ ...current, [key]: value }));
@@ -207,6 +250,64 @@ function Index() {
                 Hasil: {buildNumber(data)} — bulan Romawi dan tahun mengikuti tanggal surat.
               </p>
             </fieldset>
+            <fieldset className="space-y-3 rounded-md border border-border p-3">
+              <legend className="px-1 text-sm font-semibold">Kepada (penerima perintah)</legend>
+              <p className="text-xs text-muted-foreground">
+                Centang personel yang menerima perintah. Data diambil dari database.
+              </p>
+              <div className="space-y-2">
+                {personelList.map((p) => (
+                  <label key={p.nrp} className="flex cursor-pointer items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={selectedNrp.includes(p.nrp)}
+                      onChange={() => togglePersonel(p.nrp)}
+                    />
+                    <span>
+                      <span className="font-medium">
+                        {p.pangkat} {p.nama}
+                      </span>
+                      <span className="block text-xs text-muted-foreground">
+                        NRP {p.nrp} — {p.jabatan}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <details className="rounded-md border border-dashed border-border p-3">
+                <summary className="cursor-pointer text-xs font-semibold">Tambah personel baru</summary>
+                <div className="mt-3 space-y-2">
+                  {(
+                    [
+                      ["nama", "Nama (mis. SURYANTO, SH.)"],
+                      ["pangkat", "Pangkat (mis. AIPDA)"],
+                      ["nrp", "NRP (sebagai ID)"],
+                      ["jabatan", "Jabatan"],
+                    ] as const
+                  ).map(([key, placeholder]) => (
+                    <input
+                      key={key}
+                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
+                      placeholder={placeholder}
+                      value={newPersonel[key]}
+                      onChange={(event) =>
+                        setNewPersonel((current) => ({ ...current, [key]: event.target.value }))
+                      }
+                    />
+                  ))}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    disabled={saving || !newPersonel.nrp.trim() || !newPersonel.nama.trim()}
+                    onClick={addPersonel}
+                  >
+                    {saving ? "Menyimpan…" : "Simpan personel"}
+                  </Button>
+                </div>
+              </details>
+            </fieldset>
             {fields.map((field) => (
               <label className="block" key={field.key}>
                 <span className="mb-1.5 block text-sm font-semibold">{field.label}</span>
@@ -263,15 +364,14 @@ function Index() {
 
               <DocumentRow label="Kepada">
                 <ol className="document-list recipients">
-                  {lines(data.recipients).map((item, index) => {
-                    const [name, role] = item.split("|");
-                    return (
-                      <li key={`${item}-${index}`}>
-                        <span className="recipient-name">{name}</span>
-                        {role ? <span className="recipient-role">{role}</span> : null}
-                      </li>
-                    );
-                  })}
+                  {selectedPersonel.map((p) => (
+                    <li key={p.nrp}>
+                      <span className="recipient-name">
+                        {p.pangkat} {p.nama} NRP {p.nrp}
+                      </span>
+                      <span className="recipient-role">{p.jabatan}</span>
+                    </li>
+                  ))}
                 </ol>
               </DocumentRow>
 
