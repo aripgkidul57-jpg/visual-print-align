@@ -135,6 +135,50 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const [data, setData] = useState(initialData);
+  const [personelList, setPersonelList] = useState<Personel[]>([]);
+  const [selectedNrp, setSelectedNrp] = useState<string[]>(["79120041", "83040626"]);
+  const [newPersonel, setNewPersonel] = useState<Personel>({ nrp: "", nama: "", pangkat: "", jabatan: "" });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from("personel")
+      .select("*")
+      .order("nama")
+      .then(({ data: rows }) => {
+        if (rows) setPersonelList(rows);
+      });
+  }, []);
+
+  const selectedPersonel = selectedNrp
+    .map((nrp) => personelList.find((p) => p.nrp === nrp))
+    .filter((p): p is Personel => Boolean(p));
+
+  const togglePersonel = (nrp: string) => {
+    setSelectedNrp((current) =>
+      current.includes(nrp) ? current.filter((item) => item !== nrp) : [...current, nrp],
+    );
+  };
+
+  const addPersonel = async () => {
+    if (!newPersonel.nrp.trim() || !newPersonel.nama.trim()) return;
+    setSaving(true);
+    const row = {
+      nrp: newPersonel.nrp.trim(),
+      nama: newPersonel.nama.trim(),
+      pangkat: newPersonel.pangkat.trim(),
+      jabatan: newPersonel.jabatan.trim(),
+    };
+    const { error } = await supabase.from("personel").upsert(row);
+    setSaving(false);
+    if (error) return;
+    setPersonelList((current) => {
+      const rest = current.filter((p) => p.nrp !== row.nrp);
+      return [...rest, row].sort((a, b) => a.nama.localeCompare(b.nama));
+    });
+    setSelectedNrp((current) => (current.includes(row.nrp) ? current : [...current, row.nrp]));
+    setNewPersonel({ nrp: "", nama: "", pangkat: "", jabatan: "" });
+  };
 
   const update = (key: keyof LetterData, value: string) => {
     setData((current) => ({ ...current, [key]: value }));
@@ -262,15 +306,14 @@ function Index() {
 
               <DocumentRow label="Kepada">
                 <ol className="document-list recipients">
-                  {lines(data.recipients).map((item, index) => {
-                    const [name, role] = item.split("|");
-                    return (
-                      <li key={`${item}-${index}`}>
-                        <span className="recipient-name">{name}</span>
-                        {role ? <span className="recipient-role">{role}</span> : null}
-                      </li>
-                    );
-                  })}
+                  {selectedPersonel.map((p) => (
+                    <li key={p.nrp}>
+                      <span className="recipient-name">
+                        {p.pangkat} {p.nama} NRP {p.nrp}
+                      </span>
+                      <span className="recipient-role">{p.jabatan}</span>
+                    </li>
+                  ))}
                 </ol>
               </DocumentRow>
 
