@@ -244,11 +244,11 @@
 .signature-office { padding-top: 11px; }
 .signature-office p, .signature-name p { margin: 0; }
 .signature-office p:last-child { margin-top: 1px; }
-.signature-name { margin-top: 0; }
+.signature-name { margin-top: 80px; }
 .signature-name p:first-child { margin-bottom: 0; }
 .signature-name p:last-child {
   display: inline-block;
-  margin-top: 64px;
+  margin-top: 0;
   border-top: 1px solid var(--document);
 }
 
