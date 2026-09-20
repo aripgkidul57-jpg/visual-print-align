@@ -42,8 +42,6 @@ const initialData: LetterData = {
   tugas: "giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo",
   bases:
     "Undang – Undang Negara Republik Indonesia Nomor 2 Tahun 2002 tgl 08 Januari 2002 tentang Kepolisian Negara Republik Indonesia;\nPeraturan Kepala Kepolisian Negara Republik Indonesia Nomor 15 Tahun 2007 tentang Naskah Dinas di lingkungan Kepolisian Negara Republik Indonesia;\nDisposisi Kasat Intelkam untuk Lidik dan Monitor",
-  recipients:
-    "AIPDA SURYANTO, SH. NRP 79120041|Ps. KANIT I INTELKAM\nBRIGADIR FAJRI WAHYUDIONO, SH. NRP 83040626|ANGGOTA UNIT I INTELKAM",
   duties:
     "melaporkan hasil pelaksanaannya kepada pimpinan;\nmelaksanakan perintah ini dengan seksama dan penuh rasa tanggung jawab.",
   city: "Situbondo",
@@ -104,12 +102,6 @@ const fields: Array<{
   { key: "resort", label: "Kesatuan" },
   { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
   { key: "bases", label: "Dasar", multiline: true, hint: "Satu butir per baris" },
-  {
-    key: "recipients",
-    label: "Kepada",
-    multiline: true,
-    hint: "Satu orang per baris; pisahkan nama dan jabatan dengan |",
-  },
   { key: "duties", label: "Untuk", multiline: true, hint: "Satu butir per baris" },
   { key: "city", label: "Dikeluarkan di" },
   { key: "authority", label: "Atas nama" },
