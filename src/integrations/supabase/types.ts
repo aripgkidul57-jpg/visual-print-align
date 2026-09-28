@@ -35,6 +35,39 @@ export type Database = {
         }
         Relationships: []
       }
+      surat_perintah: {
+        Row: {
+          created_at: string
+          data: Json
+          id: string
+          nomor: string
+          penerima_nrp: string[]
+          tanggal: string
+          tugas: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          id?: string
+          nomor: string
+          penerima_nrp?: string[]
+          tanggal: string
+          tugas?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          id?: string
+          nomor?: string
+          penerima_nrp?: string[]
+          tanggal?: string
+          tugas?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
