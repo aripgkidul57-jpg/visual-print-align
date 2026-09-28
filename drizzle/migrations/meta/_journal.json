@@ -15,6 +15,13 @@
       "when": 1790624065597,
       "tag": "0001_create_surat_perintah",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790624339619,
+      "tag": "0002_create_profiles_and_roles",
+      "breakpoints": true
     }
   ]
 }
