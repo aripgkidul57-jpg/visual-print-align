@@ -134,6 +134,7 @@ export const Route = createFileRoute("/_authenticated/surat")({
 });
 
 function Index() {
+  const navigate = useNavigate();
   const [data, setData] = useState(initialData);
   const [personelList, setPersonelList] = useState<Personel[]>([]);
   const [selectedNrp, setSelectedNrp] = useState<string[]>(["79120041", "83040626"]);
