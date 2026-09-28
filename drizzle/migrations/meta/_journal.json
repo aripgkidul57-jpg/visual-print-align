@@ -8,6 +8,13 @@
       "when": 1789890383923,
       "tag": "0000_create_personel_table",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790624065597,
+      "tag": "0001_create_surat_perintah",
+      "breakpoints": true
     }
   ]
 }
