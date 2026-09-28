@@ -184,6 +184,54 @@ function Index() {
     setData((current) => ({ ...current, [key]: value }));
   };
 
+  const [arsip, setArsip] = useState<Array<{ id: string; nomor: string; tanggal: string; data: unknown; penerima_nrp: string[] }>>([]);
+  const [currentId, setCurrentId] = useState<string | null>(null);
+  const [status, setStatus] = useState("");
+
+  const loadArsip = () =>
+    supabase
+      .from("surat_perintah")
+      .select("id, nomor, tanggal, data, penerima_nrp")
+      .order("created_at", { ascending: false })
+      .then(({ data: rows }) => rows && setArsip(rows));
+
+  useEffect(() => {
+    loadArsip();
+  }, []);
+
+  const simpanSurat = async () => {
+    const row = {
+      nomor: buildNumber(data),
+      tanggal: data.issueDate,
+      tugas: data.tugas ?? "",
+      data: data as unknown as Record<string, string>,
+      penerima_nrp: selectedNrp,
+      updated_at: new Date().toISOString(),
+    };
+    const res = currentId
+      ? await supabase.from("surat_perintah").update(row).eq("id", currentId).select("id").single()
+      : await supabase.from("surat_perintah").insert(row).select("id").single();
+    if (res.error) return setStatus("Gagal menyimpan");
+    setCurrentId(res.data.id);
+    setStatus("Tersimpan");
+    loadArsip();
+  };
+
+  const bukaSurat = (id: string) => {
+    if (!id) {
+      setCurrentId(null);
+      setData(initialData);
+      setStatus("");
+      return;
+    }
+    const s = arsip.find((a) => a.id === id);
+    if (!s) return;
+    setData({ ...initialData, ...(s.data as Partial<LetterData>) });
+    setSelectedNrp(s.penerima_nrp);
+    setCurrentId(id);
+    setStatus("");
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       <header className="screen-only sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur">
@@ -194,10 +242,29 @@ function Index() {
             </p>
             <h1 className="text-lg font-bold">Surat Perintah</h1>
           </div>
-          <Button onClick={() => window.print()} size="lg">
-            <Printer aria-hidden="true" />
-            Cetak surat
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              className="h-10 max-w-[260px] rounded-md border border-input bg-background px-2 text-sm"
+              value={currentId ?? ""}
+              onChange={(event) => bukaSurat(event.target.value)}
+              aria-label="Arsip surat"
+            >
+              <option value="">+ Surat baru</option>
+              {arsip.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.nomor}
+                </option>
+              ))}
+            </select>
+            {status ? <span className="text-xs text-muted-foreground">{status}</span> : null}
+            <Button onClick={simpanSurat} size="lg" variant="secondary">
+              Simpan surat
+            </Button>
+            <Button onClick={() => window.print()} size="lg">
+              <Printer aria-hidden="true" />
+              Cetak surat
+            </Button>
+          </div>
         </div>
       </header>
 
