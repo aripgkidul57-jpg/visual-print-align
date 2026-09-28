@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Printer } from "lucide-react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { LogOut, Printer } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -263,6 +263,10 @@ function Index() {
             <Button onClick={() => window.print()} size="lg">
               <Printer aria-hidden="true" />
               Cetak surat
+            </Button>
+            <Button onClick={keluar} size="lg" variant="outline">
+              <LogOut aria-hidden="true" />
+              Keluar
             </Button>
           </div>
         </div>
