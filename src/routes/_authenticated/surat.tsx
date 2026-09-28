@@ -232,6 +232,11 @@ function Index() {
     setStatus("");
   };
 
+  const keluar = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  };
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       <header className="screen-only sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur">
