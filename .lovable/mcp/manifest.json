@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "sdk_version": "3.0.4",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://favyxdmyuvekbplbhtds.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "layout-perfection-project",
+      "version": "0.1.0",
+      "title": "Layout Perfection Project"
+    },
+    "tools": [
+      {
+        "name": "list_personel",
+        "title": "Daftar personel",
+        "description": "Menampilkan daftar personel (NRP, nama, pangkat, jabatan).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {},
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_surat",
+        "title": "Daftar Surat Perintah",
+        "description": "Menampilkan arsip Surat Perintah terbaru (nomor, tanggal, tugas, NRP penerima).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "description": "Jumlah maksimum, default 20.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "add_personel",
+        "title": "Tambah/ubah personel",
+        "description": "Menambah atau memperbarui data personel berdasarkan NRP.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "https://json-schema.org/draft/2020-12/schema",
+          "type": "object",
+          "properties": {
+            "nrp": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nama": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pangkat": {
+              "type": "string",
+              "minLength": 1
+            },
+            "jabatan": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "nrp",
+            "nama",
+            "pangkat",
+            "jabatan"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
