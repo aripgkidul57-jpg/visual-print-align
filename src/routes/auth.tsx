@@ -24,11 +24,20 @@ export const Route = createFileRoute("/auth")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>): { next?: string } => {
+    const n = s["next"];
+    return typeof n === "string" && n.startsWith("/") && !n.startsWith("//") ? { next: n } : {};
+  },
   component: AuthPage,
 });
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
+  const lanjut = () => {
+    if (next) window.location.href = next;
+    else navigate({ to: "/surat", replace: true });
+  };
   const [mode, setMode] = useState<"masuk" | "daftar">("masuk");
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
@@ -38,13 +47,14 @@ function AuthPage() {
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") navigate({ to: "/surat", replace: true });
+      if (event === "SIGNED_IN") lanjut();
     });
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/surat", replace: true });
+      if (data.session) lanjut();
     });
     return () => sub.subscription.unsubscribe();
-  }, [navigate]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate, next]);
 
   const kirimEmail = async (e: FormEvent) => {
     e.preventDefault();
@@ -61,7 +71,7 @@ function AuthPage() {
         password,
         options: {
           data: { full_name: nama },
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: window.location.origin + (next ?? ""),
         },
       });
       if (error) {
@@ -81,7 +91,7 @@ function AuthPage() {
     setBusy(true);
     setPesan(null);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: window.location.origin + (next ?? ""),
     });
     if (result?.error) {
       setPesan({ jenis: "error", teks: "Gagal masuk dengan Google. Coba lagi." });
