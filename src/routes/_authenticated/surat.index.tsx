@@ -121,7 +121,7 @@ const fields: Array<{
 
 const lines = (value: string) => (value ?? "").split("\n").filter((line) => line.trim());
 
-export const Route = createFileRoute("/_authenticated/surat")({
+export const Route = createFileRoute("/_authenticated/surat/")({
   head: () => ({
     meta: [
       { title: "Form Surat Perintah | Polres Situbondo" },
