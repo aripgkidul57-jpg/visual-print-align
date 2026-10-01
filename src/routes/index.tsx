@@ -36,7 +36,7 @@ function LandingPage() {
     supabase.auth.getSession().then(({ data }) => {
       if (!active) return;
       if (data.session) {
-        navigate({ to: "/surat", replace: true });
+        navigate({ to: "/dashboard", replace: true });
       } else {
         setChecking(false);
       }

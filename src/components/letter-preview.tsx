@@ -1,0 +1,30 @@
+import type { ReactNode } from "react";
+
+import { buildNumber, formatTanggal, splitLines, type LetterData, type Personel } from "@/lib/surat";
+
+export function LetterPreview({ data, recipients }: { data: LetterData; recipients: Personel[] }) {
+  return (
+    <article className="print-sheet mx-auto bg-paper text-document shadow-paper">
+      <header className="letterhead"><div>{data.agency}</div><div>{data.region}</div><div className="letterhead-rule">{data.resort}</div></header>
+      <div className="document-title"><div className="document-title-inner"><h2>SURAT PERINTAH</h2><p>Nomor : {buildNumber(data)}</p></div></div>
+      <div className="document-body">
+        <DocumentRow label="Pertimbangan"><p>Adanya {data.tugas ?? ""}.</p></DocumentRow>
+        <DocumentRow label="Dasar"><ol className="document-list">{splitLines(data.bases).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
+        <p className="command-title">DIPERINTAHKAN</p>
+        <DocumentRow label="Kepada"><ol className="document-list recipients">{recipients.map((p) => <li key={p.nrp}><span className="recipient-name">{p.pangkat} {p.nama} NRP {p.nrp}</span><span className="recipient-role">{p.jabatan}</span></li>)}</ol></DocumentRow>
+        <DocumentRow label="Untuk"><ol className="document-list duties">{data.tugas?.trim() ? <li>melaksanakan Tugas {data.tugas};</li> : null}{splitLines(data.duties).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
+        <p className="finished">Selesai.</p>
+        <div className="signature-block">
+          <div className="signature-meta"><span>Dikeluarkan di</span><b>:</b><span>{data.city}</span><span>Pada tanggal</span><b>:</b><span>{formatTanggal(data.issueDate)}</span></div>
+          <div className="signature-office"><p>{data.authority}</p><p>{data.office}</p></div>
+          <div className="signature-name"><p>{data.signer}</p><p>{data.signerRank}</p></div>
+        </div>
+        <div className="copies"><p>Tembusan :</p><p>{data.copyTo}</p></div>
+      </div>
+    </article>
+  );
+}
+
+function DocumentRow({ label, children }: { label: string; children: ReactNode }) {
+  return <div className="document-row"><div>{label}</div><div>:</div><div>{children}</div></div>;
+}

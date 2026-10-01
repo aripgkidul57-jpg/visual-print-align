@@ -43,7 +43,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
   },
   component: Consent,
   errorComponent: ({ error }) => (
-    <main className="p-8 text-center">Permintaan izin tidak dapat dimuat: {String(error?.message ?? error)}</main>
+    <main className="p-8 text-center">Permintaan izin tidak dapat dimuat: {error instanceof Error ? error.message : String(error)}</main>
   ),
 });
 

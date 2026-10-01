@@ -14,8 +14,15 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedSuratRouteImport } from './routes/_authenticated/surat'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AuthenticatedSuratIndexRouteImport } from './routes/_authenticated/surat.index'
+import { Route as AuthenticatedSuratIdRouteImport } from './routes/_authenticated/surat.$id'
+import { Route as AuthenticatedSuratBaruRouteImport } from './routes/_authenticated/surat.baru'
+import { Route as AuthenticatedSuratIdIndexRouteImport } from './routes/_authenticated/surat.$id.index'
+import { Route as AuthenticatedSuratIdCetakRouteImport } from './routes/_authenticated/surat.$id.cetak'
+import { Route as AuthenticatedSuratIdEditRouteImport } from './routes/_authenticated/surat.$id.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,6 +49,11 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSuratRoute = AuthenticatedSuratRouteImport.update({
   id: '/surat',
   path: '/surat',
@@ -52,22 +64,67 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSuratIndexRoute = AuthenticatedSuratIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedSuratRoute,
+} as any)
+const AuthenticatedSuratIdRoute = AuthenticatedSuratIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedSuratRoute,
+} as any)
+const AuthenticatedSuratBaruRoute = AuthenticatedSuratBaruRouteImport.update({
+  id: '/baru',
+  path: '/baru',
+  getParentRoute: () => AuthenticatedSuratRoute,
+} as any)
+const AuthenticatedSuratIdIndexRoute =
+  AuthenticatedSuratIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedSuratIdRoute,
+  } as any)
+const AuthenticatedSuratIdCetakRoute =
+  AuthenticatedSuratIdCetakRouteImport.update({
+    id: '/cetak',
+    path: '/cetak',
+    getParentRoute: () => AuthenticatedSuratIdRoute,
+  } as any)
+const AuthenticatedSuratIdEditRoute =
+  AuthenticatedSuratIdEditRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => AuthenticatedSuratIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/surat': typeof AuthenticatedSuratRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/surat/$id': typeof AuthenticatedSuratIdRouteWithChildren
+  '/surat/baru': typeof AuthenticatedSuratBaruRoute
+  '/surat/': typeof AuthenticatedSuratIndexRoute
+  '/surat/$id/cetak': typeof AuthenticatedSuratIdCetakRoute
+  '/surat/$id/edit': typeof AuthenticatedSuratIdEditRoute
+  '/surat/$id/': typeof AuthenticatedSuratIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/surat': typeof AuthenticatedSuratRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/surat/baru': typeof AuthenticatedSuratBaruRoute
+  '/surat': typeof AuthenticatedSuratIndexRoute
+  '/surat/$id/cetak': typeof AuthenticatedSuratIdCetakRoute
+  '/surat/$id/edit': typeof AuthenticatedSuratIdEditRoute
+  '/surat/$id': typeof AuthenticatedSuratIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,8 +133,15 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/_authenticated/surat': typeof AuthenticatedSuratRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/_authenticated/surat/$id': typeof AuthenticatedSuratIdRouteWithChildren
+  '/_authenticated/surat/baru': typeof AuthenticatedSuratBaruRoute
+  '/_authenticated/surat/': typeof AuthenticatedSuratIndexRoute
+  '/_authenticated/surat/$id/cetak': typeof AuthenticatedSuratIdCetakRoute
+  '/_authenticated/surat/$id/edit': typeof AuthenticatedSuratIdEditRoute
+  '/_authenticated/surat/$id/': typeof AuthenticatedSuratIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -86,16 +150,28 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/dashboard'
     | '/surat'
     | '/.lovable/oauth/consent'
+    | '/surat/$id'
+    | '/surat/baru'
+    | '/surat/'
+    | '/surat/$id/cetak'
+    | '/surat/$id/edit'
+    | '/surat/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
-    | '/surat'
+    | '/dashboard'
     | '/.lovable/oauth/consent'
+    | '/surat/baru'
+    | '/surat'
+    | '/surat/$id/cetak'
+    | '/surat/$id/edit'
+    | '/surat/$id'
   id:
     | '__root__'
     | '/'
@@ -103,8 +179,15 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/dashboard'
     | '/_authenticated/surat'
     | '/.lovable/oauth/consent'
+    | '/_authenticated/surat/$id'
+    | '/_authenticated/surat/baru'
+    | '/_authenticated/surat/'
+    | '/_authenticated/surat/$id/cetak'
+    | '/_authenticated/surat/$id/edit'
+    | '/_authenticated/surat/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/surat': {
       id: '/_authenticated/surat'
       path: '/surat'
@@ -167,15 +257,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/surat/': {
+      id: '/_authenticated/surat/'
+      path: '/'
+      fullPath: '/surat/'
+      preLoaderRoute: typeof AuthenticatedSuratIndexRouteImport
+      parentRoute: typeof AuthenticatedSuratRoute
+    }
+    '/_authenticated/surat/$id': {
+      id: '/_authenticated/surat/$id'
+      path: '/$id'
+      fullPath: '/surat/$id'
+      preLoaderRoute: typeof AuthenticatedSuratIdRouteImport
+      parentRoute: typeof AuthenticatedSuratRoute
+    }
+    '/_authenticated/surat/baru': {
+      id: '/_authenticated/surat/baru'
+      path: '/baru'
+      fullPath: '/surat/baru'
+      preLoaderRoute: typeof AuthenticatedSuratBaruRouteImport
+      parentRoute: typeof AuthenticatedSuratRoute
+    }
+    '/_authenticated/surat/$id/': {
+      id: '/_authenticated/surat/$id/'
+      path: '/'
+      fullPath: '/surat/$id/'
+      preLoaderRoute: typeof AuthenticatedSuratIdIndexRouteImport
+      parentRoute: typeof AuthenticatedSuratIdRoute
+    }
+    '/_authenticated/surat/$id/cetak': {
+      id: '/_authenticated/surat/$id/cetak'
+      path: '/cetak'
+      fullPath: '/surat/$id/cetak'
+      preLoaderRoute: typeof AuthenticatedSuratIdCetakRouteImport
+      parentRoute: typeof AuthenticatedSuratIdRoute
+    }
+    '/_authenticated/surat/$id/edit': {
+      id: '/_authenticated/surat/$id/edit'
+      path: '/edit'
+      fullPath: '/surat/$id/edit'
+      preLoaderRoute: typeof AuthenticatedSuratIdEditRouteImport
+      parentRoute: typeof AuthenticatedSuratIdRoute
+    }
   }
 }
 
+interface AuthenticatedSuratIdRouteChildren {
+  AuthenticatedSuratIdCetakRoute: typeof AuthenticatedSuratIdCetakRoute
+  AuthenticatedSuratIdEditRoute: typeof AuthenticatedSuratIdEditRoute
+  AuthenticatedSuratIdIndexRoute: typeof AuthenticatedSuratIdIndexRoute
+}
+
+const AuthenticatedSuratIdRouteChildren: AuthenticatedSuratIdRouteChildren = {
+  AuthenticatedSuratIdCetakRoute: AuthenticatedSuratIdCetakRoute,
+  AuthenticatedSuratIdEditRoute: AuthenticatedSuratIdEditRoute,
+  AuthenticatedSuratIdIndexRoute: AuthenticatedSuratIdIndexRoute,
+}
+
+const AuthenticatedSuratIdRouteWithChildren =
+  AuthenticatedSuratIdRoute._addFileChildren(AuthenticatedSuratIdRouteChildren)
+
+interface AuthenticatedSuratRouteChildren {
+  AuthenticatedSuratIdRoute: typeof AuthenticatedSuratIdRouteWithChildren
+  AuthenticatedSuratBaruRoute: typeof AuthenticatedSuratBaruRoute
+  AuthenticatedSuratIndexRoute: typeof AuthenticatedSuratIndexRoute
+}
+
+const AuthenticatedSuratRouteChildren: AuthenticatedSuratRouteChildren = {
+  AuthenticatedSuratIdRoute: AuthenticatedSuratIdRouteWithChildren,
+  AuthenticatedSuratBaruRoute: AuthenticatedSuratBaruRoute,
+  AuthenticatedSuratIndexRoute: AuthenticatedSuratIndexRoute,
+}
+
+const AuthenticatedSuratRouteWithChildren =
+  AuthenticatedSuratRoute._addFileChildren(AuthenticatedSuratRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedSuratRoute: typeof AuthenticatedSuratRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSuratRoute: typeof AuthenticatedSuratRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedSuratRoute: AuthenticatedSuratRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSuratRoute: AuthenticatedSuratRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =

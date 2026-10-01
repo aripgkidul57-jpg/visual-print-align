@@ -36,7 +36,7 @@ function AuthPage() {
   const { next } = Route.useSearch();
   const lanjut = () => {
     if (next) window.location.href = next;
-    else navigate({ to: "/surat", replace: true });
+    else navigate({ to: "/dashboard", replace: true });
   };
   const [mode, setMode] = useState<"masuk" | "daftar">("masuk");
   const [nama, setNama] = useState("");
@@ -100,7 +100,7 @@ function AuthPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4 text-foreground">
+    <main className="auth-shell flex min-h-screen items-center justify-center px-4 text-foreground">
       <div className="w-full max-w-sm rounded-lg border border-border bg-card p-8 shadow-sm">
         <div className="text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
