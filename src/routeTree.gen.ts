@@ -14,8 +14,11 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedSuratRouteImport } from './routes/_authenticated/surat'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AuthenticatedSuratBaruRouteImport } from './routes/_authenticated/surat.baru'
+import { Route as AuthenticatedSuratIdEditRouteImport } from './routes/_authenticated/surat.$id.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,6 +45,11 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSuratRoute = AuthenticatedSuratRouteImport.update({
   id: '/surat',
   path: '/surat',
@@ -52,22 +60,39 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSuratBaruRoute = AuthenticatedSuratBaruRouteImport.update({
+  id: '/baru',
+  path: '/baru',
+  getParentRoute: () => AuthenticatedSuratRoute,
+} as any)
+const AuthenticatedSuratIdEditRoute =
+  AuthenticatedSuratIdEditRouteImport.update({
+    id: '/$id/edit',
+    path: '/$id/edit',
+    getParentRoute: () => AuthenticatedSuratRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/surat': typeof AuthenticatedSuratRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/surat/baru': typeof AuthenticatedSuratBaruRoute
+  '/surat/$id/edit': typeof AuthenticatedSuratIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/surat': typeof AuthenticatedSuratRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/surat/baru': typeof AuthenticatedSuratBaruRoute
+  '/surat/$id/edit': typeof AuthenticatedSuratIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,8 +101,11 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/_authenticated/surat': typeof AuthenticatedSuratRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
+  '/_authenticated/surat/baru': typeof AuthenticatedSuratBaruRoute
+  '/_authenticated/surat/$id/edit': typeof AuthenticatedSuratIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -86,16 +114,22 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/dashboard'
     | '/surat'
     | '/.lovable/oauth/consent'
+    | '/surat/baru'
+    | '/surat/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/dashboard'
     | '/surat'
     | '/.lovable/oauth/consent'
+    | '/surat/baru'
+    | '/surat/$id/edit'
   id:
     | '__root__'
     | '/'
@@ -103,8 +137,11 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/dashboard'
     | '/_authenticated/surat'
     | '/.lovable/oauth/consent'
+    | '/_authenticated/surat/baru'
+    | '/_authenticated/surat/$id/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/surat': {
       id: '/_authenticated/surat'
       path: '/surat'
@@ -167,15 +211,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/surat/baru': {
+      id: '/_authenticated/surat/baru'
+      path: '/baru'
+      fullPath: '/surat/baru'
+      preLoaderRoute: typeof AuthenticatedSuratBaruRouteImport
+      parentRoute: typeof AuthenticatedSuratRoute
+    }
+    '/_authenticated/surat/$id/edit': {
+      id: '/_authenticated/surat/$id/edit'
+      path: '/$id/edit'
+      fullPath: '/surat/$id/edit'
+      preLoaderRoute: typeof AuthenticatedSuratIdEditRouteImport
+      parentRoute: typeof AuthenticatedSuratRoute
+    }
   }
 }
 
+interface AuthenticatedSuratRouteChildren {
+  AuthenticatedSuratBaruRoute: typeof AuthenticatedSuratBaruRoute
+  AuthenticatedSuratIdEditRoute: typeof AuthenticatedSuratIdEditRoute
+}
+
+const AuthenticatedSuratRouteChildren: AuthenticatedSuratRouteChildren = {
+  AuthenticatedSuratBaruRoute: AuthenticatedSuratBaruRoute,
+  AuthenticatedSuratIdEditRoute: AuthenticatedSuratIdEditRoute,
+}
+
+const AuthenticatedSuratRouteWithChildren =
+  AuthenticatedSuratRoute._addFileChildren(AuthenticatedSuratRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedSuratRoute: typeof AuthenticatedSuratRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedSuratRoute: typeof AuthenticatedSuratRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedSuratRoute: AuthenticatedSuratRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedSuratRoute: AuthenticatedSuratRouteWithChildren,
 }
 
 const AuthenticatedRouteRouteWithChildren =
