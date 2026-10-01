@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Eye, FilePlus2, Pencil, Printer, Search, Trash2 } from "lucide-react";
+import { Eye, FilePlus2, FileText, Pencil, Printer, Search, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
