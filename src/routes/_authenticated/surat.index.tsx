@@ -13,123 +13,15 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import type { SuratRecord } from "@/lib/surat";
 
-type Personel = {
-  nrp: string;
-  nama: string;
-  pangkat: string;
-  jabatan: string;
-};
-
-type LetterData = {
-  agency: string;
-  region: string;
-  resort: string;
-  numberPrefix: string;
-  numberSequence: string;
-  numberSuffix: string;
-  issueDate: string;
-  tugas: string;
-  bases: string;
-  duties: string;
-  city: string;
-  authority: string;
-  office: string;
-  signer: string;
-  signerRank: string;
-  copyTo: string;
-};
-
-const initialData: LetterData = {
-  agency: "KEPOLISIAN NEGARA REPUBLIK INDONESIA",
-  region: "DAERAH JAWA TIMUR",
-  resort: "RESORT SITUBONDO",
-  numberPrefix: "R/Sprin",
-  numberSequence: "2487",
-  numberSuffix: "Satintelkam",
-  issueDate: "2016-02-21",
-  tugas: "giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo",
-  bases:
-    "Undang – Undang Negara Republik Indonesia Nomor 2 Tahun 2002 tgl 08 Januari 2002 tentang Kepolisian Negara Republik Indonesia;\nPeraturan Kepala Kepolisian Negara Republik Indonesia Nomor 15 Tahun 2007 tentang Naskah Dinas di lingkungan Kepolisian Negara Republik Indonesia;\nDisposisi Kasat Intelkam untuk Lidik dan Monitor",
-  duties:
-    "melaporkan hasil pelaksanaannya kepada pimpinan;\nmelaksanakan perintah ini dengan seksama dan penuh rasa tanggung jawab.",
-  city: "Situbondo",
-  authority: "a.n. KEPALA KEPOLISIAN RESORT SITUBONDO",
-  office: "KASAT INTELKAM",
-  signer: "MOHAMAD DJUPRI",
-  signerRank: "INSPEKTUR POLISI SATU NRP 68020388",
-  copyTo: "Kapolres Situbondo.",
-};
-
-const ROMAWI = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
-const BULAN_ID = [
-  "Januari",
-  "Pebruari",
-  "Maret",
-  "April",
-  "Mei",
-  "Juni",
-  "Juli",
-  "Agustus",
-  "September",
-  "Oktober",
-  "Nopember",
-  "Desember",
-];
-
-function parseIssueDate(value: string) {
-  const [year, month, day] = value.split("-").map(Number);
-  if (!year || !month || !day) return null;
-  return { year, month, day };
-}
-
-function buildNumber(data: Pick<LetterData, "numberPrefix" | "numberSequence" | "numberSuffix" | "issueDate">) {
-  const parsed = parseIssueDate(data.issueDate);
-  const month = parsed ? ROMAWI[parsed.month - 1] : "…";
-  const year = parsed ? String(parsed.year) : "…";
-  const prefix = (data.numberPrefix ?? "").trim();
-  const sequence = (data.numberSequence ?? "").trim() || "…";
-  const suffix = (data.numberSuffix ?? "").trim();
-  const head = prefix ? `${prefix}-${sequence}` : sequence;
-  return suffix ? `${head}/${month}/${year}/${suffix}` : `${head}/${month}/${year}`;
-}
-
-function formatTanggal(value: string) {
-  const parsed = parseIssueDate(value);
-  if (!parsed) return "…";
-  return `${parsed.day} ${BULAN_ID[parsed.month - 1]} ${parsed.year}`;
-}
-
-const fields: Array<{
-  key: keyof LetterData;
-  label: string;
-  multiline?: boolean;
-  hint?: string;
-}> = [
-  { key: "agency", label: "Instansi" },
-  { key: "region", label: "Daerah" },
-  { key: "resort", label: "Kesatuan" },
-  { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
-  { key: "bases", label: "Dasar", multiline: true, hint: "Satu butir per baris" },
-  { key: "duties", label: "Untuk", multiline: true, hint: "Satu butir per baris" },
-  { key: "city", label: "Dikeluarkan di" },
-  { key: "authority", label: "Atas nama" },
-  { key: "office", label: "Jabatan penanda tangan" },
-  { key: "signer", label: "Nama penanda tangan" },
-  { key: "signerRank", label: "Pangkat / NRP" },
-  { key: "copyTo", label: "Tembusan" },
-];
-
-const lines = (value: string) => (value ?? "").split("\n").filter((line) => line.trim());
-
 export const Route = createFileRoute("/_authenticated/surat/")({
   head: () => ({
     meta: [
-      { title: "Form Surat Perintah | Polres Situbondo" },
+      { title: "Arsip Surat Perintah | Polres Situbondo" },
       {
         name: "description",
-        content: "Form penyusunan dan pencetakan Surat Perintah Kepolisian Resort Situbondo.",
+        content: "Daftar dan pengelolaan Surat Perintah Kepolisian Resort Situbondo.",
       },
-      { property: "og:title", content: "Form Surat Perintah | Polres Situbondo" },
+      { property: "og:title", content: "Arsip Surat Perintah | Polres Situbondo" },
       {
         property: "og:description",
         content: "Susun dan cetak Surat Perintah dalam format A4 resmi.",

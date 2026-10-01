@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep Surat Perintah list, form, detail, and print preview as separate routes so each workflow remains focused and directly navigable.
