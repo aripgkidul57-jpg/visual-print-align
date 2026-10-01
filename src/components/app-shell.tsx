@@ -28,7 +28,7 @@ export function AppShell({ children, title, description, action }: AppShellProps
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {open ? <button aria-label="Tutup menu" className="fixed inset-0 z-30 bg-foreground/35 lg:hidden" onClick={() => setOpen(false)} /> : null}
+      {open ? <Button aria-label="Tutup menu" variant="ghost" className="fixed inset-0 z-30 h-auto w-auto rounded-none bg-foreground/35 p-0 hover:bg-foreground/35 lg:hidden" onClick={() => setOpen(false)} /> : null}
       <aside className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex h-20 items-center justify-between border-b border-sidebar-border px-5">
           <Link to="/dashboard" className="flex items-center gap-3" onClick={() => setOpen(false)}>

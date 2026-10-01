@@ -1,9 +1,17 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LogOut, Printer } from "lucide-react";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Eye, FilePlus2, Pencil, Printer, Search, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
+import { AppShell } from "@/components/app-shell";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
+  AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
+import type { SuratRecord } from "@/lib/surat";
 
 type Personel = {
   nrp: string;
@@ -130,372 +138,48 @@ export const Route = createFileRoute("/_authenticated/surat")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: Index,
+  component: SuratListPage,
 });
 
-function Index() {
-  const navigate = useNavigate();
-  const [data, setData] = useState(initialData);
-  const [personelList, setPersonelList] = useState<Personel[]>([]);
-  const [selectedNrp, setSelectedNrp] = useState<string[]>(["79120041", "83040626"]);
-  const [newPersonel, setNewPersonel] = useState<Personel>({ nrp: "", nama: "", pangkat: "", jabatan: "" });
-  const [saving, setSaving] = useState(false);
+function SuratListPage() {
+  const [surat, setSurat] = useState<SuratRecord[]>([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    supabase
-      .from("personel")
-      .select("*")
-      .order("nama")
-      .then(({ data: rows }) => {
-        if (rows) setPersonelList(rows);
-      });
-  }, []);
-
-  const selectedPersonel = selectedNrp
-    .map((nrp) => personelList.find((p) => p.nrp === nrp))
-    .filter((p): p is Personel => Boolean(p));
-
-  const togglePersonel = (nrp: string) => {
-    setSelectedNrp((current) =>
-      current.includes(nrp) ? current.filter((item) => item !== nrp) : [...current, nrp],
-    );
+  const load = async () => {
+    setLoading(true);
+    const { data, error: fetchError } = await supabase.from("surat_perintah").select("*").order("created_at", { ascending: false });
+    if (fetchError) setError("Arsip surat tidak dapat dimuat.");
+    else setSurat((data ?? []) as SuratRecord[]);
+    setLoading(false);
   };
 
-  const addPersonel = async () => {
-    if (!newPersonel.nrp.trim() || !newPersonel.nama.trim()) return;
-    setSaving(true);
-    const row = {
-      nrp: newPersonel.nrp.trim(),
-      nama: newPersonel.nama.trim(),
-      pangkat: newPersonel.pangkat.trim(),
-      jabatan: newPersonel.jabatan.trim(),
-    };
-    const { error } = await supabase.from("personel").upsert(row);
-    setSaving(false);
-    if (error) return;
-    setPersonelList((current) => {
-      const rest = current.filter((p) => p.nrp !== row.nrp);
-      return [...rest, row].sort((a, b) => a.nama.localeCompare(b.nama));
-    });
-    setSelectedNrp((current) => (current.includes(row.nrp) ? current : [...current, row.nrp]));
-    setNewPersonel({ nrp: "", nama: "", pangkat: "", jabatan: "" });
-  };
+  useEffect(() => { load(); }, []);
+  const filtered = useMemo(() => {
+    const term = search.trim().toLocaleLowerCase("id");
+    if (!term) return surat;
+    return surat.filter((item) => item.nomor.toLocaleLowerCase("id").includes(term) || item.tugas.toLocaleLowerCase("id").includes(term));
+  }, [search, surat]);
 
-  const update = (key: keyof LetterData, value: string) => {
-    setData((current) => ({ ...current, [key]: value }));
-  };
-
-  const [arsip, setArsip] = useState<Array<{ id: string; nomor: string; tanggal: string; data: unknown; penerima_nrp: string[] }>>([]);
-  const [currentId, setCurrentId] = useState<string | null>(null);
-  const [status, setStatus] = useState("");
-
-  const loadArsip = () =>
-    supabase
-      .from("surat_perintah")
-      .select("id, nomor, tanggal, data, penerima_nrp")
-      .order("created_at", { ascending: false })
-      .then(({ data: rows }) => rows && setArsip(rows));
-
-  useEffect(() => {
-    loadArsip();
-  }, []);
-
-  const simpanSurat = async () => {
-    const row = {
-      nomor: buildNumber(data),
-      tanggal: data.issueDate,
-      tugas: data.tugas ?? "",
-      data: data as unknown as Record<string, string>,
-      penerima_nrp: selectedNrp,
-      updated_at: new Date().toISOString(),
-    };
-    const res = currentId
-      ? await supabase.from("surat_perintah").update(row).eq("id", currentId).select("id").single()
-      : await supabase.from("surat_perintah").insert(row).select("id").single();
-    if (res.error) return setStatus("Gagal menyimpan");
-    setCurrentId(res.data.id);
-    setStatus("Tersimpan");
-    loadArsip();
-  };
-
-  const bukaSurat = (id: string) => {
-    if (!id) {
-      setCurrentId(null);
-      setData(initialData);
-      setStatus("");
-      return;
-    }
-    const s = arsip.find((a) => a.id === id);
-    if (!s) return;
-    setData({ ...initialData, ...(s.data as Partial<LetterData>) });
-    setSelectedNrp(s.penerima_nrp);
-    setCurrentId(id);
-    setStatus("");
-  };
-
-  const keluar = async () => {
-    await supabase.auth.signOut();
-    navigate({ to: "/auth", replace: true });
+  const hapus = async (id: string) => {
+    const { error: deleteError } = await supabase.from("surat_perintah").delete().eq("id", id);
+    if (deleteError) setError("Surat gagal dihapus.");
+    else setSurat((current) => current.filter((item) => item.id !== id));
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <header className="screen-only sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1480px] items-center justify-between gap-4 px-5 py-3 lg:px-8">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Administrasi surat
-            </p>
-            <h1 className="text-lg font-bold">Surat Perintah</h1>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <select
-              className="h-10 max-w-[260px] rounded-md border border-input bg-background px-2 text-sm"
-              value={currentId ?? ""}
-              onChange={(event) => bukaSurat(event.target.value)}
-              aria-label="Arsip surat"
-            >
-              <option value="">+ Surat baru</option>
-              {arsip.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.nomor}
-                </option>
-              ))}
-            </select>
-            {status ? <span className="text-xs text-muted-foreground">{status}</span> : null}
-            <Button onClick={simpanSurat} size="lg" variant="secondary">
-              Simpan surat
-            </Button>
-            <Button onClick={() => window.print()} size="lg">
-              <Printer aria-hidden="true" />
-              Cetak surat
-            </Button>
-            <Button onClick={keluar} size="lg" variant="outline">
-              <LogOut aria-hidden="true" />
-              Keluar
-            </Button>
-          </div>
+    <AppShell title="Surat Perintah" description="Kelola seluruh arsip surat perintah" action={<Button asChild><Link to="/surat/baru"><FilePlus2 />Buat surat</Link></Button>}>
+      <div className="rounded-md border border-border bg-card">
+        <div className="flex flex-col gap-4 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div><h2 className="font-bold">Daftar surat</h2><p className="mt-1 text-sm text-muted-foreground">{surat.length} surat tersimpan</p></div>
+          <div className="relative w-full sm:max-w-xs"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari nomor atau tugas…" aria-label="Cari surat" /></div>
         </div>
-      </header>
-
-      <div className="workspace mx-auto grid max-w-[1480px] items-start gap-6 px-5 py-6 lg:grid-cols-[380px_minmax(0,1fr)] lg:px-8">
-        <aside className="screen-only rounded-lg border border-border bg-card shadow-sm lg:sticky lg:top-24">
-          <div className="border-b border-border px-5 py-4">
-            <h2 className="font-bold">Isi surat</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Perubahan langsung tampil pada lembar A4.</p>
-          </div>
-          <div className="form-scroll space-y-4 p-5 lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto">
-            <fieldset className="space-y-3 rounded-md border border-border p-3">
-              <legend className="px-1 text-sm font-semibold">Nomor surat</legend>
-              <div className="grid grid-cols-3 gap-2">
-                <label className="block">
-                  <span className="mb-1 block text-xs font-semibold">Awalan</span>
-                  <input
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
-                    value={data.numberPrefix}
-                    onChange={(event) => update("numberPrefix", event.target.value)}
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-xs font-semibold">Nomor urut</span>
-                  <input
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
-                    inputMode="numeric"
-                    value={data.numberSequence}
-                    onChange={(event) => update("numberSequence", event.target.value)}
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-xs font-semibold">Akhiran</span>
-                  <input
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
-                    value={data.numberSuffix}
-                    onChange={(event) => update("numberSuffix", event.target.value)}
-                  />
-                </label>
-              </div>
-              <label className="block">
-                <span className="mb-1 block text-xs font-semibold">Tanggal surat</span>
-                <input
-                  className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
-                  type="date"
-                  value={data.issueDate}
-                  onChange={(event) => update("issueDate", event.target.value)}
-                />
-              </label>
-              <p className="text-xs text-muted-foreground">
-                Hasil: {buildNumber(data)} — bulan Romawi dan tahun mengikuti tanggal surat.
-              </p>
-            </fieldset>
-            <fieldset className="space-y-3 rounded-md border border-border p-3">
-              <legend className="px-1 text-sm font-semibold">Kepada (penerima perintah)</legend>
-              <p className="text-xs text-muted-foreground">
-                Centang personel yang menerima perintah. Data diambil dari database.
-              </p>
-              <div className="space-y-2">
-                {personelList.map((p) => (
-                  <label key={p.nrp} className="flex cursor-pointer items-start gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      className="mt-1"
-                      checked={selectedNrp.includes(p.nrp)}
-                      onChange={() => togglePersonel(p.nrp)}
-                    />
-                    <span>
-                      <span className="font-medium">
-                        {p.pangkat} {p.nama}
-                      </span>
-                      <span className="block text-xs text-muted-foreground">
-                        NRP {p.nrp} — {p.jabatan}
-                      </span>
-                    </span>
-                  </label>
-                ))}
-              </div>
-              <details className="rounded-md border border-dashed border-border p-3">
-                <summary className="cursor-pointer text-xs font-semibold">Tambah personel baru</summary>
-                <div className="mt-3 space-y-2">
-                  {(
-                    [
-                      ["nama", "Nama (mis. SURYANTO, SH.)"],
-                      ["pangkat", "Pangkat (mis. AIPDA)"],
-                      ["nrp", "NRP (sebagai ID)"],
-                      ["jabatan", "Jabatan"],
-                    ] as const
-                  ).map(([key, placeholder]) => (
-                    <input
-                      key={key}
-                      className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
-                      placeholder={placeholder}
-                      value={newPersonel[key]}
-                      onChange={(event) =>
-                        setNewPersonel((current) => ({ ...current, [key]: event.target.value }))
-                      }
-                    />
-                  ))}
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    disabled={saving || !newPersonel.nrp.trim() || !newPersonel.nama.trim()}
-                    onClick={addPersonel}
-                  >
-                    {saving ? "Menyimpan…" : "Simpan personel"}
-                  </Button>
-                </div>
-              </details>
-            </fieldset>
-            {fields.map((field) => (
-              <label className="block" key={field.key}>
-                <span className="mb-1.5 block text-sm font-semibold">{field.label}</span>
-                {field.multiline ? (
-                  <textarea
-                    className="min-h-24 w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm leading-relaxed outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
-                    value={data[field.key]}
-                    onChange={(event) => update(field.key, event.target.value)}
-                  />
-                ) : (
-                  <input
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/20"
-                    value={data[field.key]}
-                    onChange={(event) => update(field.key, event.target.value)}
-                  />
-                )}
-                {field.hint ? (
-                  <span className="mt-1 block text-xs text-muted-foreground">{field.hint}</span>
-                ) : null}
-              </label>
-            ))}
-          </div>
-        </aside>
-
-        <section className="preview-stage min-w-0 overflow-auto rounded-lg bg-preview p-4 sm:p-7" aria-label="Pratinjau cetak">
-          <article className="print-sheet mx-auto bg-paper text-document shadow-paper">
-            <header className="letterhead">
-              <div>{data.agency}</div>
-              <div>{data.region}</div>
-              <div className="letterhead-rule">{data.resort}</div>
-            </header>
-
-            <div className="document-title">
-              <div className="document-title-inner">
-                <h2>SURAT PERINTAH</h2>
-                <p>Nomor : {buildNumber(data)}</p>
-              </div>
-            </div>
-
-            <div className="document-body">
-              <DocumentRow label="Pertimbangan">
-                <p>Adanya {data.tugas ?? ""}.</p>
-              </DocumentRow>
-
-              <DocumentRow label="Dasar">
-                <ol className="document-list">
-                  {lines(data.bases).map((item, index) => (
-                    <li key={`${item}-${index}`}>{item}</li>
-                  ))}
-                </ol>
-              </DocumentRow>
-
-              <p className="command-title">DIPERINTAHKAN</p>
-
-              <DocumentRow label="Kepada">
-                <ol className="document-list recipients">
-                  {selectedPersonel.map((p) => (
-                    <li key={p.nrp}>
-                      <span className="recipient-name">
-                        {p.pangkat} {p.nama} NRP {p.nrp}
-                      </span>
-                      <span className="recipient-role">{p.jabatan}</span>
-                    </li>
-                  ))}
-                </ol>
-              </DocumentRow>
-
-              <DocumentRow label="Untuk">
-                <ol className="document-list duties">
-                  {data.tugas?.trim() ? <li>melaksanakan Tugas {data.tugas};</li> : null}
-                  {lines(data.duties).map((item, index) => (
-                    <li key={`${item}-${index}`}>{item}</li>
-                  ))}
-                </ol>
-              </DocumentRow>
-
-              <p className="finished">Selesai.</p>
-
-              <div className="signature-block">
-                <div className="signature-meta">
-                  <span>Dikeluarkan di</span><b>:</b><span>{data.city}</span>
-                  <span>Pada tanggal</span><b>:</b><span>{formatTanggal(data.issueDate)}</span>
-                </div>
-                <div className="signature-office">
-                  <p>{data.authority}</p>
-                  <p>{data.office}</p>
-                </div>
-                <div className="signature-name">
-                  <p>{data.signer}</p>
-                  <p>{data.signerRank}</p>
-                </div>
-              </div>
-
-              <div className="copies">
-                <p>Tembusan :</p>
-                <p>{data.copyTo}</p>
-              </div>
-            </div>
-          </article>
-        </section>
+        {error ? <p role="alert" className="m-4 rounded-md bg-destructive/5 p-3 text-sm text-destructive">{error}</p> : null}
+        {loading ? <p className="p-10 text-center text-sm text-muted-foreground">Memuat arsip surat…</p> : filtered.length === 0 ? <div className="p-12 text-center"><FileText className="mx-auto h-10 w-10 text-muted-foreground" /><h3 className="mt-3 font-semibold">Belum ada surat</h3><p className="mt-1 text-sm text-muted-foreground">Buat surat pertama untuk memulai arsip.</p></div> : (
+          <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-muted/60 text-xs uppercase text-muted-foreground"><tr><th className="px-5 py-3 font-semibold">Nomor surat</th><th className="px-5 py-3 font-semibold">Tanggal</th><th className="px-5 py-3 font-semibold">Tugas</th><th className="px-5 py-3 text-right font-semibold">Tindakan</th></tr></thead><tbody className="divide-y divide-border">{filtered.map((item) => <tr key={item.id} className="hover:bg-muted/35"><td className="px-5 py-4 font-semibold">{item.nomor}</td><td className="whitespace-nowrap px-5 py-4 text-muted-foreground">{new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${item.tanggal}T00:00:00`))}</td><td className="max-w-md truncate px-5 py-4 text-muted-foreground">{item.tugas || "—"}</td><td className="px-5 py-3"><div className="flex justify-end gap-1"><Button asChild variant="ghost" size="icon" title="Lihat"><Link to="/surat/$id" params={{ id: item.id }}><Eye /></Link></Button><Button asChild variant="ghost" size="icon" title="Edit"><Link to="/surat/$id/edit" params={{ id: item.id }}><Pencil /></Link></Button><Button asChild variant="ghost" size="icon" title="Cetak"><Link to="/surat/$id/cetak" params={{ id: item.id }}><Printer /></Link></Button><AlertDialog><AlertDialogTrigger asChild><Button variant="ghost" size="icon" title="Hapus" className="text-destructive hover:text-destructive"><Trash2 /></Button></AlertDialogTrigger><AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Hapus surat ini?</AlertDialogTitle><AlertDialogDescription>Surat {item.nomor} akan dihapus permanen dari arsip.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Batal</AlertDialogCancel><AlertDialogAction onClick={() => hapus(item.id)}>Hapus</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog></div></td></tr>)}</tbody></table></div>
+        )}
       </div>
-    </main>
-  );
-}
-
-function DocumentRow({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="document-row">
-      <div>{label}</div>
-      <div>:</div>
-      <div>{children}</div>
-    </div>
+    </AppShell>
   );
 }
