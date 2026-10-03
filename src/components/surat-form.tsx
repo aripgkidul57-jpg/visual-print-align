@@ -64,9 +64,10 @@ export function SuratForm({ id }: { id?: string }) {
         <div className="mx-auto max-w-5xl space-y-6">
           {error ? <div role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</div> : null}
           <FormSection title="Identitas surat" description="Nomor surat tersusun otomatis dari tanggal yang dipilih.">
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-5">
               <Field label="Awalan"><Input value={data.numberPrefix} onChange={(e) => update("numberPrefix", e.target.value)} /></Field>
               <Field label="Nomor urut"><Input inputMode="numeric" value={data.numberSequence} onChange={(e) => update("numberSequence", e.target.value)} /></Field>
+              <Field label="KKA"><Input value={data.numberKka} onChange={(e) => update("numberKka", e.target.value)} /></Field>
               <Field label="Akhiran"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
               <Field label="Tanggal surat"><Input type="date" value={data.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
             </div>
