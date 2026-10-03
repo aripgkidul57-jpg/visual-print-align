@@ -11,6 +11,7 @@ export type LetterData = {
   resort: string;
   numberPrefix: string;
   numberSequence: string;
+  numberKka: string;
   numberSuffix: string;
   issueDate: string;
   tugas: string;
@@ -39,8 +40,9 @@ export const initialLetterData: LetterData = {
   agency: "KEPOLISIAN NEGARA REPUBLIK INDONESIA",
   region: "DAERAH JAWA TIMUR",
   resort: "RESORT SITUBONDO",
-  numberPrefix: "R/Sprin",
+  numberPrefix: "R/Sprint",
   numberSequence: "2487",
+  numberKka: "PAM.3.3",
   numberSuffix: "Satintelkam",
   issueDate: "2016-02-21",
   tugas: "giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo",
@@ -68,15 +70,16 @@ function parseIssueDate(value: string) {
   return { year, month, day };
 }
 
-export function buildNumber(data: Pick<LetterData, "numberPrefix" | "numberSequence" | "numberSuffix" | "issueDate">) {
+export function buildNumber(data: Pick<LetterData, "numberPrefix" | "numberSequence" | "numberKka" | "numberSuffix" | "issueDate">) {
   const parsed = parseIssueDate(data.issueDate);
   const month = parsed ? ROMAWI[parsed.month - 1] : "…";
   const year = parsed ? String(parsed.year) : "…";
   const prefix = (data.numberPrefix ?? "").trim();
   const sequence = (data.numberSequence ?? "").trim() || "…";
+  const kka = (data.numberKka ?? "").trim();
   const suffix = (data.numberSuffix ?? "").trim();
   const head = prefix ? `${prefix}-${sequence}` : sequence;
-  return suffix ? `${head}/${month}/${year}/${suffix}` : `${head}/${month}/${year}`;
+  return [head, month, kka, year, suffix].filter(Boolean).join("/");
 }
 
 export function formatTanggal(value: string) {
