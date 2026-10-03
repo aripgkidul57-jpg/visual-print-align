@@ -6,9 +6,11 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { buildNumber, hydrateLetterData, initialLetterData, type LetterData, type Personel } from "@/lib/surat";
 
+const adminOnly: Array<keyof LetterData> = ["agency","region","resort","city","authority","office","signer","signerRank"];
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [
   { key: "agency", label: "Instansi" }, { key: "region", label: "Daerah" }, { key: "resort", label: "Kesatuan" },
   { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
@@ -27,6 +29,8 @@ export function SuratForm({ id }: { id?: string }) {
   const [loading, setLoading] = useState(Boolean(id));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const { isAdmin } = useIsAdmin();
+  const [pick, setPick] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -74,10 +78,15 @@ export function SuratForm({ id }: { id?: string }) {
             <div className="mt-4 rounded-md bg-muted px-4 py-3 text-sm"><span className="text-muted-foreground">Nomor lengkap</span><strong className="mt-1 block">{buildNumber(data)}</strong></div>
           </FormSection>
           <FormSection title="Penerima perintah" description="Pilih satu atau beberapa personel dari data yang tersedia.">
-            <div className="grid gap-2 md:grid-cols-2">{personel.map((p) => <label key={p.nrp} className="flex cursor-pointer items-start gap-3 rounded-md border border-border p-3 transition-colors hover:bg-accent"><input type="checkbox" className="mt-1" checked={selectedNrp.includes(p.nrp)} onChange={() => toggle(p.nrp)} /><span><strong className="block text-sm">{p.pangkat} {p.nama}</strong><span className="text-xs text-muted-foreground">NRP {p.nrp} · {p.jabatan}</span></span></label>)}</div>
+            {isAdmin ? <div className="grid gap-2 md:grid-cols-2">{personel.map((p) => <label key={p.nrp} className="flex cursor-pointer items-start gap-3 rounded-md border border-border p-3 transition-colors hover:bg-accent"><input type="checkbox" className="mt-1" checked={selectedNrp.includes(p.nrp)} onChange={() => toggle(p.nrp)} /><span><strong className="block text-sm">{p.pangkat} {p.nama}</strong><span className="text-xs text-muted-foreground">NRP {p.nrp} · {p.jabatan}</span></span></label>)}</div> : (
+              <div className="space-y-3">
+                <div className="flex gap-2"><select className="h-10 flex-1 rounded-md border border-input bg-background px-3 text-sm" value={pick} onChange={(e) => setPick(e.target.value)}><option value="">Pilih personel…</option>{personel.filter((p) => !selectedNrp.includes(p.nrp)).map((p) => <option key={p.nrp} value={p.nrp}>{p.pangkat} {p.nama} — NRP {p.nrp}</option>)}</select><Button type="button" variant="outline" disabled={!pick} onClick={() => { toggle(pick); setPick(""); }}>Tambah</Button></div>
+                <ul className="space-y-2">{personel.filter((p) => selectedNrp.includes(p.nrp)).map((p) => <li key={p.nrp} className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"><span><strong>{p.pangkat} {p.nama}</strong><span className="block text-xs text-muted-foreground">NRP {p.nrp} · {p.jabatan}</span></span><Button type="button" variant="ghost" size="sm" onClick={() => toggle(p.nrp)}>Hapus</Button></li>)}</ul>
+              </div>
+            )}
           </FormSection>
           <FormSection title="Isi dan penandatangan" description="Gunakan satu baris untuk setiap butir pada kolom Dasar dan Untuk.">
-            <div className="grid gap-4 md:grid-cols-2">{fields.map((field) => <Field key={field.key} label={field.label} hint={field.hint ?? ""} wide={field.multiline ?? false}>{field.multiline ? <Textarea className="min-h-28" value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} /> : <Input value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} />}</Field>)}</div>
+            <div className="grid gap-4 md:grid-cols-2">{fields.filter((f) => isAdmin || !adminOnly.includes(f.key)).map((field) => <Field key={field.key} label={field.label} hint={field.hint ?? ""} wide={field.multiline ?? false}>{field.multiline ? <Textarea className="min-h-28" value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} /> : <Input value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} />}</Field>)}</div>
           </FormSection>
           <div className="sticky bottom-4 flex justify-end rounded-md border border-border bg-card p-3 shadow-sm"><Button size="lg" onClick={simpan} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Save />}{saving ? "Menyimpan…" : "Simpan surat"}</Button></div>
         </div>

@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedSuratRouteImport } from './routes/_authenticated/surat'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
@@ -49,6 +50,11 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/surat/baru': typeof AuthenticatedSuratBaruRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/admin'
     | '/dashboard'
     | '/surat'
     | '/.lovable/oauth/consent'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/admin'
     | '/dashboard'
     | '/.lovable/oauth/consent'
     | '/surat/baru'
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/surat'
     | '/.lovable/oauth/consent'
@@ -235,6 +247,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/.well-known/oauth-protected-resource'
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -333,11 +352,13 @@ const AuthenticatedSuratRouteWithChildren =
   AuthenticatedSuratRoute._addFileChildren(AuthenticatedSuratRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedSuratRoute: typeof AuthenticatedSuratRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedSuratRoute: AuthenticatedSuratRouteWithChildren,
 }
