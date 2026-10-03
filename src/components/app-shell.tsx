@@ -3,6 +3,7 @@ import { FilePlus2, FileText, LayoutDashboard, LogOut, Menu, ShieldCheck, X } fr
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
 
 type AppShellProps = {
@@ -20,6 +21,7 @@ const navItems = [
 export function AppShell({ children, title, description, action }: AppShellProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const { isAdmin } = useIsAdmin();
 
   const keluar = async () => {
     await supabase.auth.signOut();
@@ -38,7 +40,7 @@ export function AppShell({ children, title, description, action }: AppShellProps
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(false)} aria-label="Tutup menu"><X /></Button>
         </div>
         <nav className="flex-1 space-y-1 p-3" aria-label="Navigasi utama">
-          {navItems.map((item) => (
+          {[...navItems, ...(isAdmin ? [{ to: "/admin" as const, label: "Admin", icon: ShieldCheck }] : [])].map((item) => (
             <Link key={item.to} to={item.to} onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-sidebar-foreground/75 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" activeProps={{ className: "bg-sidebar-accent text-sidebar-accent-foreground" }}>
               <item.icon className="h-4 w-4" aria-hidden="true" />{item.label}
             </Link>
