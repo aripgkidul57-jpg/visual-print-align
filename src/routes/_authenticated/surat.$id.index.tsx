@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { formatTanggal, hydrateLetterData, type SuratRecord } from "@/lib/surat";
+import { formatTanggal, hydrateLetterData, type Personel, type SuratRecord } from "@/lib/surat";
 
 export const Route = createFileRoute("/_authenticated/surat/$id/")({
   head: () => ({ meta: [
@@ -31,4 +31,4 @@ function SuratDetailPage() {
     </div>
   </AppShell>;
 }
-function Info({ label, value }: { label: string; value: string }) { return <div className="rounded-md border border-border bg-card p-5"><p className="text-xs font-semibold uppercase text-muted-foreground">{label}</p><p className="mt-2 text-sm font-medium leading-relaxed">{value || "—"}</p></div>; }
+function Info({ label, value, children }: { label: string; value: string; children?: React.ReactNode }) { return <div className="rounded-md border border-border bg-card p-5"><p className="text-xs font-semibold uppercase text-muted-foreground">{label}</p><p className="mt-2 text-sm font-medium leading-relaxed">{value || "—"}</p>{children}</div>; }
