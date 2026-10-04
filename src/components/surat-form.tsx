@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, Plus, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
@@ -31,6 +31,10 @@ export function SuratForm({ id }: { id?: string }) {
   const [error, setError] = useState("");
   const { isAdmin } = useIsAdmin();
   const [pick, setPick] = useState("");
+  const emptyPersonel: Personel = { nrp: "", nama: "", pangkat: "", jabatan: "" };
+  const [personelForm, setPersonelForm] = useState<Personel | null>(null);
+  const [personelSaving, setPersonelSaving] = useState(false);
+  const [personelError, setPersonelError] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -51,6 +55,24 @@ export function SuratForm({ id }: { id?: string }) {
 
   const update = (key: keyof LetterData, value: string) => setData((current) => ({ ...current, [key]: value }));
   const toggle = (nrp: string) => setSelectedNrp((current) => current.includes(nrp) ? current.filter((item) => item !== nrp) : [...current, nrp]);
+  const simpanPersonel = async () => {
+    if (!personelForm) return;
+    if (!personelForm.nrp.trim() || !personelForm.nama.trim()) { setPersonelError("NRP dan nama wajib diisi."); return; }
+    setPersonelSaving(true); setPersonelError("");
+    const row = { nrp: personelForm.nrp.trim(), nama: personelForm.nama.trim(), pangkat: personelForm.pangkat.trim(), jabatan: personelForm.jabatan.trim() };
+    const { error: err } = await supabase.from("personel").upsert(row, { onConflict: "nrp" });
+    setPersonelSaving(false);
+    if (err) { setPersonelError("Data personel gagal disimpan. Silakan coba lagi."); return; }
+    setPersonel((current) => [...current.filter((p) => p.nrp !== row.nrp), row].sort((a, b) => a.nama.localeCompare(b.nama)));
+    setPersonelForm(null);
+  };
+  const hapusPersonel = async (nrp: string) => {
+    if (!window.confirm("Hapus personel ini dari data? Surat yang sudah ada tidak ikut berubah.")) return;
+    const { error: err } = await supabase.from("personel").delete().eq("nrp", nrp);
+    if (err) { setPersonelError("Data personel gagal dihapus. Silakan coba lagi."); return; }
+    setPersonel((current) => current.filter((p) => p.nrp !== nrp));
+    setSelectedNrp((current) => current.filter((item) => item !== nrp));
+  };
   const simpan = async () => {
     setSaving(true); setError("");
     const row = { nomor: buildNumber(data), tanggal: data.issueDate, tugas: data.tugas ?? "", data: data as unknown as Record<string, string>, penerima_nrp: selectedNrp, updated_at: new Date().toISOString() };
