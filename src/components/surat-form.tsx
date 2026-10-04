@@ -10,7 +10,7 @@ import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { buildNumber, hydrateLetterData, initialLetterData, type LetterData, type Personel } from "@/lib/surat";
 
-const adminOnly: Array<keyof LetterData> = ["agency","region","resort","city","authority","office","signer","signerRank"];
+const adminOnly: Array<keyof LetterData> = ["agency","region","resort","duties","city","authority","office","signer","signerRank"];
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [
   { key: "agency", label: "Instansi" }, { key: "region", label: "Daerah" }, { key: "resort", label: "Kesatuan" },
   { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
