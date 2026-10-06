@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { buildNumber, formatTanggal, splitLines, type LetterData, type Personel } from "@/lib/surat";
+import { buildNumber, buildWaktu, formatTanggal, splitLines, type LetterData, type Personel } from "@/lib/surat";
 
 export function LetterPreview({ data, recipients }: { data: LetterData; recipients: Personel[] }) {
   return (
@@ -12,7 +12,7 @@ export function LetterPreview({ data, recipients }: { data: LetterData; recipien
         <DocumentRow label="Dasar"><ol className="document-list">{splitLines(data.bases).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
         <p className="command-title">DIPERINTAHKAN</p>
         <DocumentRow label="Kepada"><ol className="document-list recipients">{recipients.map((p) => <li key={p.nrp}><span className="recipient-name">{p.pangkat} {p.nama} NRP {p.nrp}</span><span className="recipient-role">{p.jabatan}</span></li>)}</ol></DocumentRow>
-        <DocumentRow label="Untuk"><ol className="document-list duties">{data.tugas?.trim() ? <li>melaksanakan Tugas {data.tugas};</li> : null}{splitLines(data.duties).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
+        <DocumentRow label="Untuk"><ol className="document-list duties">{data.tugas?.trim() ? <li>melaksanakan Tugas {data.tugas}{buildWaktu(data) ? `, pada hari ${buildWaktu(data)}` : ""};</li> : null}{splitLines(data.duties).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
         <p className="finished">Selesai.</p>
         <div className="signature-block">
           <div className="signature-meta"><span>Dikeluarkan di</span><b>:</b><span>{data.city}</span><span>Pada tanggal</span><b>:</b><span>{formatTanggal(data.issueDate)}</span></div>

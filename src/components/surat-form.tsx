@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
-import { buildNumber, hydrateLetterData, initialLetterData, type LetterData, type Personel } from "@/lib/surat";
+import { buildNumber, hariDari, hydrateLetterData, initialLetterData, type LetterData, type Personel } from "@/lib/surat";
 
 const adminOnly: Array<keyof LetterData> = ["agency","region","resort","duties","city","authority","office","signer","signerRank"];
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [
@@ -139,6 +139,19 @@ export function SuratForm({ id }: { id?: string }) {
                 <ul className="space-y-2">{personel.filter((p) => selectedNrp.includes(p.nrp)).map((p) => <li key={p.nrp} className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"><span><strong>{p.pangkat} {p.nama}</strong><span className="block text-xs text-muted-foreground">NRP {p.nrp} · {p.jabatan}</span></span><Button type="button" variant="ghost" size="sm" onClick={() => toggle(p.nrp)}>Hapus</Button></li>)}</ul>
               </div>
             )}
+          </FormSection>
+          <FormSection title="Waktu pelaksanaan tugas" description="Ditambahkan pada butir pertama Untuk, setelah tugas. Hari terisi otomatis dari tanggal.">
+            <div className="grid gap-4 md:grid-cols-3">
+              <Field label="Hari mulai tugas"><Input value={data.startDay} onChange={(e) => update("startDay", e.target.value)} /></Field>
+              <Field label="Tanggal mulai tugas"><Input type="date" value={data.startDate} onChange={(e) => setData((c) => ({ ...c, startDate: e.target.value, startDay: hariDari(e.target.value) }))} /></Field>
+              <Field label="Jam mulai tugas"><Input type="time" value={data.startTime} onChange={(e) => update("startTime", e.target.value)} /></Field>
+            </div>
+            <p className="my-3 text-center text-sm font-semibold text-muted-foreground">sampai dengan</p>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Field label="Hari selesai tugas"><Input value={data.endDay} onChange={(e) => update("endDay", e.target.value)} /></Field>
+              <Field label="Tanggal selesai tugas"><Input type="date" value={data.endDate} onChange={(e) => setData((c) => ({ ...c, endDate: e.target.value, endDay: hariDari(e.target.value) }))} /></Field>
+              <Field label="Jam selesai tugas"><Input type="time" value={data.endTime} onChange={(e) => update("endTime", e.target.value)} /></Field>
+            </div>
           </FormSection>
           <FormSection title="Isi dan penandatangan" description="Gunakan satu baris untuk setiap butir pada kolom Dasar dan Untuk.">
             <div className="grid gap-4 md:grid-cols-2">{fields.filter((f) => isAdmin || !adminOnly.includes(f.key)).map((field) => <Field key={field.key} label={field.label} hint={field.hint ?? ""} wide={field.multiline ?? false}>{field.multiline ? <Textarea className="min-h-28" value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} /> : <Input value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} />}</Field>)}</div>
