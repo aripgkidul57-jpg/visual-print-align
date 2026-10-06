@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { formatTanggal, hydrateLetterData } from "@/lib/surat";
 
-type Recent = { id: string; nomor: string; tanggal: string; tugas: string; startDate: string; endDate: string };
+type Recent = { id: string; nomor: string; tanggal: string; tugas: string; startDate: string; endDate: string; penerimaNrp: string[] };
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -21,21 +21,20 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function DashboardPage() {
   const [all, setAll] = useState<Recent[]>([]);
-  const [personel, setPersonel] = useState(0);
   const [fromDate, setFromDate] = useState(today());
   const [toDate, setToDate] = useState(today());
 
   useEffect(() => {
-    Promise.all([
-      supabase.from("surat_perintah").select("id, nomor, tanggal, tugas, data").order("created_at", { ascending: false }),
-      supabase.from("personel").select("nrp", { count: "exact", head: true }),
-    ]).then(([letters, people]) => {
-      setAll((letters.data ?? []).map((s) => {
-        const d = hydrateLetterData(s.data);
-        return { id: s.id, nomor: s.nomor, tanggal: s.tanggal, tugas: s.tugas, startDate: d.startDate, endDate: d.endDate };
-      }));
-      setPersonel(people.count ?? 0);
-    });
+    supabase
+      .from("surat_perintah")
+      .select("id, nomor, tanggal, tugas, data, penerima_nrp")
+      .order("created_at", { ascending: false })
+      .then((letters) => {
+        setAll((letters.data ?? []).map((s) => {
+          const d = hydrateLetterData(s.data);
+          return { id: s.id, nomor: s.nomor, tanggal: s.tanggal, tugas: s.tugas, startDate: d.startDate, endDate: d.endDate, penerimaNrp: s.penerima_nrp ?? [] };
+        }));
+      });
   }, []);
 
   const filtered = all.filter((s) => {
@@ -44,11 +43,20 @@ function DashboardPage() {
     return start <= toDate && end >= fromDate;
   });
 
+  const t = today();
+  const personelAktif = new Set(
+    all.filter((s) => {
+      const start = s.startDate || s.tanggal;
+      const end = s.endDate || s.startDate || s.tanggal;
+      return start <= t && end >= t;
+    }).flatMap((s) => s.penerimaNrp),
+  ).size;
+
   return <AppShell title="Dashboard" description="Ringkasan administrasi Surat Perintah" action={<Button asChild><Link to="/surat/baru"><FilePlus2 />Buat surat</Link></Button>}>
     <div className="grid gap-4 md:grid-cols-3">
       <Stat icon={FileText} label="Total surat" value={String(all.length)} note="Tersimpan dalam arsip" />
       <Stat icon={CalendarDays} label="Surat dalam periode" value={String(filtered.length)} note="Berdasarkan waktu pelaksanaan tugas" />
-      <Stat icon={Users} label="Data personel" value={String(personel)} note="Tersedia sebagai penerima" />
+      <Stat icon={Users} label="Personil menerima tugas hari ini" value={String(personelAktif)} note="Total personil dengan tugas aktif hari ini" />
     </div>
     <section className="mt-6 rounded-md border border-border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
