@@ -21,7 +21,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function DashboardPage() {
   const [all, setAll] = useState<Recent[]>([]);
-  const [personel, setPersonel] = useState(0);
   const [fromDate, setFromDate] = useState(today());
   const [toDate, setToDate] = useState(today());
 
