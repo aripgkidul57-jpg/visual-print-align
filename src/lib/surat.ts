@@ -111,7 +111,7 @@ const HARI_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"]
 export function hariDari(value: string) {
   const p = parseIssueDate(value);
   if (!p) return "";
-  return HARI_ID[new Date(p.year, p.month - 1, p.day).getDay()];
+  return HARI_ID[new Date(p.year, p.month - 1, p.day).getDay()] ?? "";
 }
 export function buildWaktu(d: LetterData) {
   const part = (day: string, date: string, time: string) =>
