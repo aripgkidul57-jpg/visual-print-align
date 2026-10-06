@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { formatTanggal, hydrateLetterData } from "@/lib/surat";
 
-type Recent = { id: string; nomor: string; tanggal: string; tugas: string; startDate: string; endDate: string };
+type Recent = { id: string; nomor: string; tanggal: string; tugas: string; startDate: string; endDate: string; penerimaNrp: string[] };
 
 const today = () => new Date().toISOString().slice(0, 10);
 
