@@ -26,16 +26,16 @@ function DashboardPage() {
   const [toDate, setToDate] = useState(today());
 
   useEffect(() => {
-    Promise.all([
-      supabase.from("surat_perintah").select("id, nomor, tanggal, tugas, data").order("created_at", { ascending: false }),
-      supabase.from("personel").select("nrp", { count: "exact", head: true }),
-    ]).then(([letters, people]) => {
-      setAll((letters.data ?? []).map((s) => {
-        const d = hydrateLetterData(s.data);
-        return { id: s.id, nomor: s.nomor, tanggal: s.tanggal, tugas: s.tugas, startDate: d.startDate, endDate: d.endDate };
-      }));
-      setPersonel(people.count ?? 0);
-    });
+    supabase
+      .from("surat_perintah")
+      .select("id, nomor, tanggal, tugas, data, penerima_nrp")
+      .order("created_at", { ascending: false })
+      .then((letters) => {
+        setAll((letters.data ?? []).map((s) => {
+          const d = hydrateLetterData(s.data);
+          return { id: s.id, nomor: s.nomor, tanggal: s.tanggal, tugas: s.tugas, startDate: d.startDate, endDate: d.endDate, penerimaNrp: s.penerima_nrp ?? [] };
+        }));
+      });
   }, []);
 
   const filtered = all.filter((s) => {
