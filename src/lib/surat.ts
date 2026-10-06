@@ -15,6 +15,12 @@ export type LetterData = {
   numberSuffix: string;
   issueDate: string;
   tugas: string;
+  startDay: string;
+  startDate: string;
+  startTime: string;
+  endDay: string;
+  endDate: string;
+  endTime: string;
   bases: string;
   duties: string;
   city: string;
@@ -46,6 +52,12 @@ export const initialLetterData: LetterData = {
   numberSuffix: "Satintelkam",
   issueDate: "2016-02-21",
   tugas: "giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo",
+  startDay: "",
+  startDate: "",
+  startTime: "",
+  endDay: "",
+  endDate: "",
+  endTime: "",
   bases:
     "Undang – Undang Negara Republik Indonesia Nomor 2 Tahun 2002 tgl 08 Januari 2002 tentang Kepolisian Negara Republik Indonesia;\nPeraturan Kepala Kepolisian Negara Republik Indonesia Nomor 15 Tahun 2007 tentang Naskah Dinas di lingkungan Kepolisian Negara Republik Indonesia;\nDisposisi Kasat Intelkam untuk Lidik dan Monitor",
   duties:
@@ -95,3 +107,17 @@ export function hydrateLetterData(value: unknown): LetterData {
 
 export const splitLines = (value: string) =>
   (value ?? "").split("\n").filter((line) => line.trim());
+const HARI_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+export function hariDari(value: string) {
+  const p = parseIssueDate(value);
+  if (!p) return "";
+  return HARI_ID[new Date(p.year, p.month - 1, p.day).getDay()];
+}
+export function buildWaktu(d: LetterData) {
+  const part = (day: string, date: string, time: string) =>
+    [day || hariDari(date), date ? formatTanggal(date) : "", time ? `pukul ${time.replace(":", ".")} WIB` : ""].filter(Boolean).join(", ");
+  const a = part(d.startDay ?? "", d.startDate ?? "", d.startTime ?? "");
+  const b = part(d.endDay ?? "", d.endDate ?? "", d.endTime ?? "");
+  if (!a && !b) return "";
+  return b ? `${a} sampai dengan ${b}` : a;
+}
