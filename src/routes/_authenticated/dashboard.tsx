@@ -43,6 +43,15 @@ function DashboardPage() {
     return start <= toDate && end >= fromDate;
   });
 
+  const t = today();
+  const personelAktif = new Set(
+    all.filter((s) => {
+      const start = s.startDate || s.tanggal;
+      const end = s.endDate || s.startDate || s.tanggal;
+      return start <= t && end >= t;
+    }).flatMap((s) => s.penerimaNrp),
+  ).size;
+
   return <AppShell title="Dashboard" description="Ringkasan administrasi Surat Perintah" action={<Button asChild><Link to="/surat/baru"><FilePlus2 />Buat surat</Link></Button>}>
     <div className="grid gap-4 md:grid-cols-3">
       <Stat icon={FileText} label="Total surat" value={String(all.length)} note="Tersimpan dalam arsip" />
