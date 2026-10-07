@@ -61,7 +61,7 @@ function DashboardPage() {
     <div className="grid gap-4 md:grid-cols-3">
       <Stat icon={FileText} label="Total surat" value={String(all.length)} note="Tersimpan dalam arsip" />
       <Stat icon={CalendarDays} label="Surat dalam periode" value={String(filtered.length)} note="Berdasarkan waktu pelaksanaan tugas" />
-      <Stat icon={Users} label="Personil menerima tugas dalam periode" value={String(personelAktif)} note="Total personil unik (nama sama dihitung satu) pada periode terpilih" />
+      <Stat icon={Users} label="Personil menerima tugas dalam periode" value={String(personelAktif)} note="Total personil pada setiap sprint dalam periode terpilih" />
     </div>
     <section className="mt-6 rounded-md border border-border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
