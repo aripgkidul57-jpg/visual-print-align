@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function DashboardPage() {
   const [all, setAll] = useState<Recent[]>([]);
+  const [namaPerNrp, setNamaPerNrp] = useState<Record<string, string>>({});
   const [fromDate, setFromDate] = useState(today());
   const [toDate, setToDate] = useState(today());
 
@@ -37,6 +38,17 @@ function DashboardPage() {
       });
   }, []);
 
+  useEffect(() => {
+    supabase
+      .from("personel")
+      .select("nrp, nama")
+      .then((rows) => {
+        const map: Record<string, string> = {};
+        for (const p of rows.data ?? []) map[p.nrp] = (p.nama ?? "").trim();
+        setNamaPerNrp(map);
+      });
+  }, []);
+
   const filtered = all.filter((s) => {
     const start = s.startDate || s.tanggal;
     const end = s.endDate || s.startDate || s.tanggal;
@@ -44,7 +56,7 @@ function DashboardPage() {
   });
 
   const personelAktif = new Set(
-    filtered.flatMap((s) => s.penerimaNrp),
+    filtered.flatMap((s) => s.penerimaNrp).map((nrp) => namaPerNrp[nrp] || nrp),
   ).size;
 
   return <AppShell title="Dashboard" description="Ringkasan administrasi Surat Perintah" action={<Button asChild><Link to="/surat/baru"><FilePlus2 />Buat surat</Link></Button>}>
