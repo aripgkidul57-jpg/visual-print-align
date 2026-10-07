@@ -37,17 +37,6 @@ function DashboardPage() {
       });
   }, []);
 
-  useEffect(() => {
-    supabase
-      .from("personel")
-      .select("nrp, nama")
-      .then((rows) => {
-        const map: Record<string, string> = {};
-        for (const p of rows.data ?? []) map[p.nrp] = (p.nama ?? "").trim();
-        setNamaPerNrp(map);
-      });
-  }, []);
-
   const filtered = all.filter((s) => {
     const start = s.startDate || s.tanggal;
     const end = s.endDate || s.startDate || s.tanggal;
