@@ -55,9 +55,7 @@ function DashboardPage() {
     return start <= toDate && end >= fromDate;
   });
 
-  const personelAktif = new Set(
-    filtered.flatMap((s) => s.penerimaNrp).map((nrp) => namaPerNrp[nrp] || nrp),
-  ).size;
+  const personelAktif = filtered.reduce((total, s) => total + s.penerimaNrp.length, 0);
 
   return <AppShell title="Dashboard" description="Ringkasan administrasi Surat Perintah" action={<Button asChild><Link to="/surat/baru"><FilePlus2 />Buat surat</Link></Button>}>
     <div className="grid gap-4 md:grid-cols-3">
