@@ -21,7 +21,6 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 
 function DashboardPage() {
   const [all, setAll] = useState<Recent[]>([]);
-  const [totalPersonel, setTotalPersonel] = useState("0");
   const [fromDate, setFromDate] = useState(today());
   const [toDate, setToDate] = useState(today());
 
@@ -36,7 +35,6 @@ function DashboardPage() {
           return { id: s.id, nomor: s.nomor, tanggal: s.tanggal, tugas: s.tugas, startDate: d.startDate, endDate: d.endDate, penerimaNrp: s.penerima_nrp ?? [] };
         }));
       });
-    supabase.from("personel").select("nrp").then((rows) => setTotalPersonel(String((rows.data ?? []).length)));
   }, []);
 
   const filtered = all.filter((s) => {
@@ -45,12 +43,13 @@ function DashboardPage() {
     return start <= toDate && end >= fromDate;
   });
 
+  const personelAktif = filtered.reduce((total, s) => total + s.penerimaNrp.length, 0);
 
   return <AppShell title="Dashboard" description="Ringkasan administrasi Surat Perintah" action={<Button asChild><Link to="/surat/baru"><FilePlus2 />Buat surat</Link></Button>}>
     <div className="grid gap-4 md:grid-cols-3">
       <Stat icon={FileText} label="Total surat" value={String(all.length)} note="Tersimpan dalam arsip" />
       <Stat icon={CalendarDays} label="Surat dalam periode" value={String(filtered.length)} note="Berdasarkan waktu pelaksanaan tugas" />
-      <Stat icon={Users} label="Total personil" value={totalPersonel} note="Seluruh personil yang terdaftar" />
+      <Stat icon={Users} label="Personil menerima tugas dalam periode" value={String(personelAktif)} note="Total personil pada setiap sprint dalam periode terpilih" />
     </div>
     <section className="mt-6 rounded-md border border-border bg-card">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-5 py-4">
