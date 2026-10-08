@@ -3,23 +3,24 @@ import type { ReactNode } from "react";
 import { buildNumber, buildWaktu, formatTanggal, splitLines, type LetterData, type Personel } from "@/lib/surat";
 
 export function LetterPreview({ data, recipients }: { data: LetterData; recipients: Personel[] }) {
+  const activity = (data.tugas ?? "").replace(/^\s*giat\b\s*/i, "").trim();
   return (
     <article className="print-sheet mx-auto bg-paper text-document shadow-paper">
       <header className="letterhead"><div>{data.agency}</div><div>{data.region}</div><div className="letterhead-rule">{data.resort}</div></header>
       <div className="document-title"><div className="document-title-inner"><h2>SURAT PERINTAH</h2><p>Nomor : {buildNumber(data)}</p></div></div>
       <div className="document-body">
-        <DocumentRow label="Pertimbangan"><p>Adanya {data.tugas ?? ""}.</p></DocumentRow>
+        <DocumentRow label="Pertimbangan"><p>bahwa dalam rangka mendukung kelancaran kegiatan {activity}.</p></DocumentRow>
         <DocumentRow label="Dasar"><ol className="document-list">{splitLines(data.bases).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
         <p className="command-title">DIPERINTAHKAN</p>
         <DocumentRow label="Kepada"><ol className="document-list recipients">{recipients.map((p) => <li key={p.nrp}><span className="recipient-name">{p.pangkat} {p.nama} NRP {p.nrp}</span><span className="recipient-role">{p.jabatan}</span></li>)}</ol></DocumentRow>
-        <DocumentRow label="Untuk"><ol className="document-list duties">{data.tugas?.trim() ? <li>melaksanakan Tugas {data.tugas}{buildWaktu(data) ? `, pada hari ${buildWaktu(data)}` : ""};</li> : null}{splitLines(data.duties).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
+        <DocumentRow label="Untuk"><ol className="document-list duties">{activity ? <li>disamping melaksanakan tugas dan jabatan sehari-hari agar melaksanakan kegiatan {activity}{buildWaktu(data) ? `, pada hari ${buildWaktu(data)}` : ""};</li> : null}{splitLines(data.duties).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
         <p className="finished">Selesai.</p>
         <div className="signature-block">
           <div className="signature-meta"><span>Dikeluarkan di</span><b>:</b><span>{data.city}</span><span>Pada tanggal</span><b>:</b><span>{formatTanggal(data.issueDate)}</span></div>
           <div className="signature-office"><p>{data.authority}</p><p>{data.office}</p></div>
           <div className="signature-name"><p>{data.signer}</p><p>{data.signerRank}</p></div>
         </div>
-        <div className="copies"><p>Tembusan :</p><p>{data.copyTo}</p></div>
+        <div className="copies"><p>Tembusan:</p><p>{data.copyTo}</p></div>
       </div>
     </article>
   );
