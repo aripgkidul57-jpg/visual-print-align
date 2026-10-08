@@ -6,3 +6,4 @@
 - [x] Verifikasi tampilan dan fungsi utama.
 - [x] Pisahkan halaman login, dashboard, daftar CRUD, form, detail, dan print preview.
 - [x] Verifikasi alur CRUD dan cetak pada desktop serta layar kecil.
+- [ ] Sesuaikan titik dua dan awalan kalimat cetak dengan Sprint 2026.pdf, lalu verifikasi pratinjau.
