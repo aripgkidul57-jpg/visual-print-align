@@ -235,7 +235,7 @@
 .finished { margin: 0; }
 
 .signature-block {
-  width: 366px;
+  width: max-content;
   margin: 2px 0 0 auto;
   text-align: center;
 }
