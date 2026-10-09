@@ -153,24 +153,33 @@
   }
 }
 
+@font-face {
+  font-family: "Sprint Condensed";
+  src: url("/fonts/sprint-condensed.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 .print-sheet {
   box-sizing: border-box;
-  width: 794px;
-  min-height: 1123px;
-  padding: 42px 86px 62px;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 11pt;
-  line-height: 1.33;
+  width: 215.05mm;
+  min-height: 330.06mm;
+  padding: 11.1mm 10mm 17.5mm 25.4mm;
+  font-family: "Arial Narrow", "Sprint Condensed", Arial, sans-serif;
+  font-size: 12pt;
+  line-height: 13.8pt;
+  letter-spacing: 0;
 }
 
 .letterhead {
   width: max-content;
   max-width: 100%;
   margin: 0;
-  padding-bottom: 2px;
+  padding-bottom: 0;
   border-bottom: 1px solid var(--document);
   text-align: center;
-  line-height: 1.35;
+  line-height: inherit;
 }
 
 .letterhead > div {
@@ -182,7 +191,7 @@
 }
 
 .document-title {
-  margin-top: 103px;
+  margin-top: 81.6pt;
   text-align: center;
 }
 
@@ -198,14 +207,14 @@
   border-bottom: 1px solid var(--document);
   font-size: 12pt;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: inherit;
 }
 
-.document-title p { margin: 1px 0 0; }
+.document-title p { margin: 0; }
 .document-body {
   display: grid;
   grid-template-columns: max-content max-content minmax(0, 1fr);
-  margin-top: 23px;
+  margin-top: 13.8pt;
 }
 
 .document-body > * { grid-column: 1 / -1; }
@@ -214,21 +223,22 @@
   display: grid;
   grid-template-columns: subgrid;
   column-gap: 0;
-  margin-bottom: 19px;
+  margin-bottom: 13.8pt;
 }
 
-.document-row > :last-child { padding-left: 9px; }
+.document-row > :last-child { padding-left: 4.5pt; text-align: justify; text-align-last: left; }
 .document-row p { margin: 0; }
 .document-list { margin: 0; padding-left: 0; list-style: none; counter-reset: document-item; }
-.document-list > li { counter-increment: document-item; position: relative; padding-left: 21.52px; margin: 0 0 2px; }
-.document-list > li::before { content: counter(document-item) "."; position: absolute; left: 0; }
-.recipients li { margin-bottom: 2px; }
+.document-list > li { counter-increment: document-item; position: relative; padding-left: calc(0.75em + 4.5pt); margin: 0 0 6pt; }
+.document-list > li::before { content: counter(document-item) "."; position: absolute; left: 0; width: 0.75em; text-align: left; }
+.document-list > li:last-child { margin-bottom: 0; }
+.recipients li { margin-bottom: 13.8pt; text-align: left; }
 .recipient-name { text-decoration: underline; }
-.recipient-role { display: block; padding-left: 4px; }
-.duties li { margin-bottom: 18px; }
+.recipient-role { display: block; padding-left: 0; }
+.duties li { margin-bottom: 6pt; }
 
 .command-title {
-  margin: 22px 0 23px;
+  margin: 13.8pt 0;
   text-align: center;
 }
 
@@ -236,23 +246,25 @@
 
 .signature-block {
   width: max-content;
-  margin: 2px 0 0 auto;
+  max-width: 100%;
+  margin: 13.8pt 0 0 auto;
   text-align: center;
+  break-inside: avoid;
 }
 
 .signature-meta {
   display: grid;
-  grid-template-columns: max-content 17px minmax(0, 1fr);
+  grid-template-columns: max-content 6pt minmax(0, 1fr);
   border-bottom: 1px solid var(--document);
-  padding: 0 4px 7px;
+  padding: 0 0 6pt;
   text-align: left;
 }
 
 .signature-meta b { font-weight: 400; }
-.signature-office { padding-top: 11px; }
+.signature-office { padding-top: 6pt; }
 .signature-office p, .signature-name p { margin: 0; }
-.signature-office p:last-child { margin-top: 1px; }
-.signature-name { margin-top: 80px; }
+.signature-office p:last-child { margin-top: 0; }
+.signature-name { margin-top: 41.4pt; }
 .signature-name p:first-child { margin-bottom: 0; }
 .signature-name p:last-child {
   display: inline-block;
@@ -261,7 +273,9 @@
 }
 
 .copies {
-  margin-top: -35px;
+  margin-top: -27.6pt;
+  max-width: 43%;
+  break-inside: avoid;
 }
 
 .copies p { margin: 0; }
@@ -269,7 +283,7 @@
   display: inline-block;
   width: max-content;
   max-width: 100%;
-  margin-top: 23px;
+  margin-top: 13.8pt;
   border-bottom: 1px solid var(--document);
 }
 
@@ -283,16 +297,17 @@
 }
 
 @media print {
-  @page { size: A4 portrait; margin: 0; }
+  @page { size: 215.05mm 330.06mm; margin: 0; }
 
-  html, body { width: 210mm; min-height: 297mm; background: var(--paper); }
+  html, body { width: 215.05mm; min-height: 330.06mm; background: var(--paper); }
   .screen-only { display: none !important; }
   .workspace { display: block; max-width: none; padding: 0; }
   .preview-stage { overflow: visible; padding: 0; background: var(--paper); border-radius: 0; }
   .print-sheet {
-    width: 210mm;
-    min-height: 297mm;
-    padding: 11.1mm 22.8mm 16.4mm;
+    width: 215.05mm;
+    min-height: 330.06mm;
+    margin: 0;
+    padding: 11.1mm 10mm 17.5mm 25.4mm;
     box-shadow: none;
     print-color-adjust: exact;
   }

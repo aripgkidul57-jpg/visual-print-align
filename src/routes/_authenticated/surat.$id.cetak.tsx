@@ -8,8 +8,8 @@ import { hydrateLetterData, type Personel, type SuratRecord } from "@/lib/surat"
 
 export const Route = createFileRoute("/_authenticated/surat/$id/cetak")({
   head: () => ({ meta: [
-    { title: "Cetak Surat Perintah — Polres Situbondo" }, { name: "description", content: "Pratinjau cetak Surat Perintah dalam format A4." },
-    { property: "og:title", content: "Cetak Surat Perintah — Polres Situbondo" }, { property: "og:description", content: "Pratinjau cetak Surat Perintah dalam format A4." },
+    { title: "Cetak Surat Perintah — Polres Situbondo" }, { name: "description", content: "Pratinjau cetak Surat Perintah dalam format F4 sesuai Sprint 2026." },
+    { property: "og:title", content: "Cetak Surat Perintah — Polres Situbondo" }, { property: "og:description", content: "Pratinjau cetak Surat Perintah dalam format F4 sesuai Sprint 2026." },
     { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" },
   ] }), component: PrintPage,
 });

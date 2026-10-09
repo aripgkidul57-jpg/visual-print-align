@@ -11,3 +11,4 @@
 
 - Keep Surat Perintah list, form, detail, and print preview as separate routes so each workflow remains focused and directly navigable.
 - Use shared CSS subgrid columns for letter labels and punctuation so all body colons align with the longest label without a preceding gap.
+- Keep letter typography and physical page geometry in shared print-sheet CSS for identical screen/print layout; use a bundled condensed-font fallback when the document font is unavailable.
