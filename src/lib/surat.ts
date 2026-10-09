@@ -63,7 +63,7 @@ export const initialLetterData: LetterData = {
   duties:
     "melaporkan hasil pelaksanaannya kepada pimpinan;\nmelaksanakan perintah ini dengan seksama dan penuh rasa tanggung jawab.",
   city: "Situbondo",
-  authority: "a.n. KEPALA KEPOLISIAN RESORT SITUBONDO",
+  authority: "a.n. KEPALA KEPOLISIAN RESORT SITUBONDO POLDA JATIM",
   office: "KASAT INTELKAM",
   signer: "MOHAMAD DJUPRI",
   signerRank: "INSPEKTUR POLISI SATU NRP 68020388",
