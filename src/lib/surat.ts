@@ -49,7 +49,7 @@ export const initialLetterData: LetterData = {
   numberPrefix: "R/Sprint",
   numberSequence: "2487",
   numberKka: "PAM.3.3",
-  numberSuffix: "Satintelkam",
+  numberSuffix: "",
   issueDate: "2016-02-21",
   tugas: "giat Lidik tentang Penunjukan Penjabat (Pj) Kepala Desa di wilayah Kab. Situbondo",
   startDay: "",
