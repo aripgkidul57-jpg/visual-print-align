@@ -191,8 +191,19 @@
 }
 
 .document-title {
+  position: relative;
   margin-top: 81.6pt;
   text-align: center;
+}
+
+.document-logo {
+  position: absolute;
+  bottom: calc(100% + 4.5pt);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22mm;
+  height: 20mm;
+  object-fit: contain;
 }
 
 .document-title-inner {
