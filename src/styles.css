@@ -295,7 +295,7 @@
   width: max-content;
   max-width: 100%;
   margin-top: 13.8pt;
-  border-bottom: 1px solid var(--document);
+  border-bottom: none;
 }
 
 @media (max-width: 1100px) {
