@@ -4,12 +4,15 @@ import { buildNumber, buildWaktu, formatTanggal, splitLines, type LetterData, ty
 
 export function LetterPreview({ data, recipients }: { data: LetterData; recipients: Personel[] }) {
   const activity = (data.tugas ?? "").replace(/^\s*giat\b\s*/i, "").trim();
+  const pertimbangan = activity
+    ? `bahwa dalam rangka mendukung kelancaran kegiatan ${activity}, dipandang perlu mengeluarkan surat perintah.`
+    : "bahwa dipandang perlu mengeluarkan surat perintah.";
   return (
     <article className="print-sheet mx-auto bg-paper text-document shadow-paper">
       <header className="letterhead"><div>{data.agency}</div><div>{data.region}</div><div className="letterhead-rule">{data.resort}</div></header>
       <div className="document-title"><div className="document-title-inner"><h2>SURAT PERINTAH</h2><p>Nomor : {buildNumber(data)}</p></div></div>
       <div className="document-body">
-        <DocumentRow label="Pertimbangan"><p>bahwa dalam rangka mendukung kelancaran kegiatan {activity}.</p></DocumentRow>
+        <DocumentRow label="Pertimbangan"><p>{pertimbangan}</p></DocumentRow>
         <DocumentRow label="Dasar"><ol className="document-list">{splitLines(data.bases).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></DocumentRow>
         <p className="command-title">DIPERINTAHKAN</p>
         <DocumentRow label="Kepada"><ol className="document-list recipients">{recipients.map((p) => <li key={p.nrp}><span className="recipient-name">{p.pangkat} {p.nama} NRP {p.nrp}</span><span className="recipient-role">{p.jabatan}</span></li>)}</ol></DocumentRow>
