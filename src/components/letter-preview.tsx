@@ -4,6 +4,9 @@ import { buildNumber, buildWaktu, formatTanggal, splitLines, type LetterData, ty
 
 export function LetterPreview({ data, recipients }: { data: LetterData; recipients: Personel[] }) {
   const activity = (data.tugas ?? "").replace(/^\s*giat\b\s*/i, "").trim();
+  const pertimbangan = activity
+    ? `bahwa dalam rangka mendukung kelancaran kegiatan ${activity}, dipandang perlu mengeluarkan surat perintah.`
+    : "bahwa dipandang perlu mengeluarkan surat perintah.";
   return (
     <article className="print-sheet mx-auto bg-paper text-document shadow-paper">
       <header className="letterhead"><div>{data.agency}</div><div>{data.region}</div><div className="letterhead-rule">{data.resort}</div></header>
