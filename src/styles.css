@@ -265,13 +265,15 @@
 
 .signature-meta {
   display: grid;
-  grid-template-columns: max-content 6pt minmax(0, 1fr);
+  grid-template-columns: max-content max-content minmax(0, 1fr);
   border-bottom: 1px solid var(--document);
   padding: 0 0 6pt;
   text-align: left;
 }
 
 .signature-meta b { font-weight: 400; }
+.signature-city, .signature-date { white-space: pre; }
+.signature-date { text-align: right; }
 .signature-office { padding-top: 6pt; }
 .signature-office p, .signature-name p { margin: 0; }
 .signature-office p:last-child { margin-top: 0; }
