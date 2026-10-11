@@ -94,8 +94,8 @@ export function SuratForm({ id }: { id?: string }) {
               <Field label="Awalan"><Input value={data.numberPrefix} onChange={(e) => update("numberPrefix", e.target.value)} /></Field>
               <Field label="Nomor urut"><Input inputMode="numeric" value={data.numberSequence} onChange={(e) => update("numberSequence", e.target.value)} /></Field>
               <Field label="KKA"><Input value={data.numberKka} onChange={(e) => update("numberKka", e.target.value)} /></Field>
-              <Field label="Akhiran"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
               <Field label="Tanggal surat"><Input type="date" value={data.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
+              <Field label="Akhiran"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
             </div>
             <div className="mt-4 rounded-md bg-muted px-4 py-3 text-sm"><span className="text-muted-foreground">Nomor lengkap</span><strong className="mt-1 block">{buildNumber(data)}</strong></div>
           </FormSection>
@@ -142,13 +142,13 @@ export function SuratForm({ id }: { id?: string }) {
           </FormSection>
           <FormSection title="Waktu pelaksanaan tugas" description="Ditambahkan pada butir pertama Untuk, setelah tugas. Hari terisi otomatis dari tanggal.">
             <div className="grid gap-4 md:grid-cols-3">
-              <Field label="Hari mulai tugas"><Input value={data.startDay} onChange={(e) => update("startDay", e.target.value)} /></Field>
+              <Field label="Hari mulai tugas"><Input value={data.startDay} readOnly /></Field>
               <Field label="Tanggal mulai tugas"><Input type="date" value={data.startDate} onChange={(e) => setData((c) => ({ ...c, startDate: e.target.value, startDay: hariDari(e.target.value) }))} /></Field>
               <Field label="Jam mulai tugas"><Input type="time" value={data.startTime} onChange={(e) => update("startTime", e.target.value)} /></Field>
             </div>
             <p className="my-3 text-center text-sm font-semibold text-muted-foreground">sampai dengan</p>
             <div className="grid gap-4 md:grid-cols-3">
-              <Field label="Hari selesai tugas"><Input value={data.endDay} onChange={(e) => update("endDay", e.target.value)} /></Field>
+              <Field label="Hari selesai tugas"><Input value={data.endDay} readOnly /></Field>
               <Field label="Tanggal selesai tugas"><Input type="date" value={data.endDate} onChange={(e) => setData((c) => ({ ...c, endDate: e.target.value, endDay: hariDari(e.target.value) }))} /></Field>
               <Field label="Jam selesai tugas"><Input type="time" value={data.endTime} onChange={(e) => update("endTime", e.target.value)} /></Field>
             </div>
