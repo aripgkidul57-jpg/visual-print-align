@@ -8,3 +8,4 @@
 - [x] Verifikasi alur CRUD dan cetak pada desktop serta layar kecil.
 - [x] Sesuaikan titik dua dan awalan kalimat cetak dengan Sprint 2026.pdf, lalu verifikasi pratinjau.
 - [x] Cocokkan tipografi, spasi, jarak bagian, justify, dan margin dengan Sprint 2026.pdf; verifikasi pratinjau dan cetak.
+- [x] Tukar posisi Akhiran dan Tanggal surat; uji hari mulai dan selesai hanya baca serta tetap mengikuti tanggal.
