@@ -2,17 +2,29 @@ import { useEffect, useState } from "react";
 
 import { supabase } from "@/integrations/supabase/client";
 
+export type Kriteria = "admin" | "maintenance" | "user";
+
+// Kriteria dibaca dari database (personil aktif yang tertaut ke akun login).
 export function useIsAdmin() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [kriteria, setKriteria] = useState<Kriteria | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     let active = true;
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) { if (active) setLoading(false); return; }
-      const { data: ok } = await supabase.rpc("has_role", { _user_id: data.user.id, _role: "admin" });
-      if (active) { setIsAdmin(Boolean(ok)); setLoading(false); }
+    supabase.rpc("current_kriteria").then(({ data }) => {
+      if (!active) return;
+      setKriteria((data as Kriteria | null) ?? null);
+      setLoading(false);
     });
     return () => { active = false; };
   }, []);
-  return { isAdmin, loading };
+  return {
+    kriteria,
+    isAdmin: kriteria === "admin",
+    canConfigure: kriteria === "admin" || kriteria === "maintenance",
+    loading,
+  };
+}
+
+export function homeFor(k: Kriteria | null) {
+  return k === "admin" ? "/admin" : k === "maintenance" ? "/maintenance" : "/dashboard";
 }
