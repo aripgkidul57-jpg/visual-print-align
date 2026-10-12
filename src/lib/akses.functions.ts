@@ -32,8 +32,8 @@ export const mintaOtp = createServerFn({ method: "POST" })
       return { ok: true };
     }
 
-    const key = process.env.SUPABASE_PUBLISHABLE_KEY!;
-    const pub = createClient(process.env.SUPABASE_URL!, key, {
+    const key = process.env['SUPABASE_PUBLISHABLE_KEY']!;
+    const pub = createClient(process.env['SUPABASE_URL']!, key, {
       auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
       global: {
         fetch: (input, init) => {
@@ -46,7 +46,7 @@ export const mintaOtp = createServerFn({ method: "POST" })
     });
     const { error } = await pub.auth.signInWithOtp({
       email: data.email,
-      options: { shouldCreateUser: false, emailRedirectTo: data.redirectTo },
+      options: { shouldCreateUser: false, ...(data.redirectTo ? { emailRedirectTo: data.redirectTo } : {}) },
     });
     if (error) {
       if (error.status === 429) return { ok: false, rateLimited: true };
