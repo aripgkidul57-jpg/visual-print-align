@@ -14,7 +14,10 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMaintenanceRouteImport } from './routes/_authenticated/maintenance'
+import { Route as AuthenticatedPersonelRouteImport } from './routes/_authenticated/personel'
 import { Route as AuthenticatedSuratRouteImport } from './routes/_authenticated/surat'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedSuratIndexRouteImport } from './routes/_authenticated/surat.index'
@@ -49,9 +52,25 @@ const Char91DotwellKnownChar93OauthProtectedResourceRoute =
     path: '/.well-known/oauth-protected-resource',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMaintenanceRoute =
+  AuthenticatedMaintenanceRouteImport.update({
+    id: '/maintenance',
+    path: '/maintenance',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPersonelRoute = AuthenticatedPersonelRouteImport.update({
+  id: '/personel',
+  path: '/personel',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSuratRoute = AuthenticatedSuratRouteImport.update({
@@ -103,7 +122,10 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/personel': typeof AuthenticatedPersonelRoute
   '/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/surat/$id': typeof AuthenticatedSuratIdRouteWithChildren
@@ -118,7 +140,10 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/personel': typeof AuthenticatedPersonelRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/surat/baru': typeof AuthenticatedSuratBaruRoute
   '/surat': typeof AuthenticatedSuratIndexRoute
@@ -133,7 +158,10 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/mcp': typeof McpRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/maintenance': typeof AuthenticatedMaintenanceRoute
+  '/_authenticated/personel': typeof AuthenticatedPersonelRoute
   '/_authenticated/surat': typeof AuthenticatedSuratRouteWithChildren
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/surat/$id': typeof AuthenticatedSuratIdRouteWithChildren
@@ -150,7 +178,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/admin'
     | '/dashboard'
+    | '/maintenance'
+    | '/personel'
     | '/surat'
     | '/.lovable/oauth/consent'
     | '/surat/$id'
@@ -165,7 +196,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/admin'
     | '/dashboard'
+    | '/maintenance'
+    | '/personel'
     | '/.lovable/oauth/consent'
     | '/surat/baru'
     | '/surat'
@@ -179,7 +213,10 @@ export interface FileRouteTypes {
     | '/auth'
     | '/mcp'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
+    | '/_authenticated/maintenance'
+    | '/_authenticated/personel'
     | '/_authenticated/surat'
     | '/.lovable/oauth/consent'
     | '/_authenticated/surat/$id'
@@ -236,11 +273,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/maintenance': {
+      id: '/_authenticated/maintenance'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof AuthenticatedMaintenanceRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/personel': {
+      id: '/_authenticated/personel'
+      path: '/personel'
+      fullPath: '/personel'
+      preLoaderRoute: typeof AuthenticatedPersonelRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/surat': {
@@ -333,12 +391,18 @@ const AuthenticatedSuratRouteWithChildren =
   AuthenticatedSuratRoute._addFileChildren(AuthenticatedSuratRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedMaintenanceRoute: typeof AuthenticatedMaintenanceRoute
+  AuthenticatedPersonelRoute: typeof AuthenticatedPersonelRoute
   AuthenticatedSuratRoute: typeof AuthenticatedSuratRouteWithChildren
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedMaintenanceRoute: AuthenticatedMaintenanceRoute,
+  AuthenticatedPersonelRoute: AuthenticatedPersonelRoute,
   AuthenticatedSuratRoute: AuthenticatedSuratRouteWithChildren,
 }
 

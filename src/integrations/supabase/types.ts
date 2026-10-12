@@ -16,22 +16,43 @@ export type Database = {
     Tables: {
       personel: {
         Row: {
+          auth_user_id: string | null
+          created_at: string
+          email: string | null
+          id: string
           jabatan: string
+          kriteria: string
           nama: string
           nrp: string
           pangkat: string
+          status: string
+          updated_at: string
         }
         Insert: {
+          auth_user_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
           jabatan: string
+          kriteria?: string
           nama: string
           nrp: string
           pangkat: string
+          status?: string
+          updated_at?: string
         }
         Update: {
+          auth_user_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
           jabatan?: string
+          kriteria?: string
           nama?: string
           nrp?: string
           pangkat?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -118,6 +139,7 @@ export type Database = {
           nama: string
         }[]
       }
+      current_kriteria: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -125,6 +147,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_active_personel: { Args: { _user_id: string }; Returns: boolean }
+      link_personel: { Args: never; Returns: string }
     }
     Enums: {
       app_role: "admin" | "operator"

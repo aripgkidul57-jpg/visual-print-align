@@ -1,9 +1,11 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { FilePlus2, FileText, LayoutDashboard, LogOut, Menu, ShieldCheck, X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { FilePlus2, FileText, LayoutDashboard, LogOut, Menu, ShieldCheck, Users, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { homeFor, useIsAdmin } from "@/hooks/use-is-admin";
 
 type AppShellProps = {
   children: ReactNode;
@@ -12,16 +14,21 @@ type AppShellProps = {
   action?: ReactNode;
 };
 
-const navItems = [
-  { to: "/dashboard" as const, label: "Dashboard", icon: LayoutDashboard },
-  { to: "/surat" as const, label: "Surat Perintah", icon: FileText },
-];
 
 export function AppShell({ children, title, description, action }: AppShellProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const { kriteria, isAdmin } = useIsAdmin();
+  const navItems = [
+    { to: homeFor(kriteria), label: "Dashboard", icon: LayoutDashboard },
+    { to: "/surat" as const, label: "Surat Perintah", icon: FileText },
+    ...(isAdmin ? [{ to: "/personel" as const, label: "Data Personil", icon: Users }] : []),
+  ];
 
   const keluar = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   };
@@ -31,7 +38,7 @@ export function AppShell({ children, title, description, action }: AppShellProps
       {open ? <Button aria-label="Tutup menu" variant="ghost" className="fixed inset-0 z-30 h-auto w-auto rounded-none bg-foreground/35 p-0 hover:bg-foreground/35 lg:hidden" onClick={() => setOpen(false)} /> : null}
       <aside className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-transform lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex h-20 items-center justify-between border-b border-sidebar-border px-5">
-          <Link to="/dashboard" className="flex items-center gap-3" onClick={() => setOpen(false)}>
+          <Link to={homeFor(kriteria)} className="flex items-center gap-3" onClick={() => setOpen(false)}>
             <span className="flex h-10 w-10 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"><ShieldCheck aria-hidden="true" /></span>
             <span><strong className="block text-sm">POLRES SITUBONDO</strong><span className="text-xs text-sidebar-foreground/65">Administrasi Surat</span></span>
           </Link>
