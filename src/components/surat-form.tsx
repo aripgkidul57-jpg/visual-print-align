@@ -29,7 +29,7 @@ export function SuratForm({ id }: { id?: string }) {
   const [loading, setLoading] = useState(Boolean(id));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin, canConfigure } = useIsAdmin();
   const [pick, setPick] = useState("");
   const emptyPersonel: Personel = { nrp: "", nama: "", pangkat: "", jabatan: "" };
   const [personelForm, setPersonelForm] = useState<Personel | null>(null);
@@ -154,7 +154,7 @@ export function SuratForm({ id }: { id?: string }) {
             </div>
           </FormSection>
           <FormSection title="Isi dan penandatangan" description="Gunakan satu baris untuk setiap butir pada kolom Dasar dan Untuk.">
-            <div className="grid gap-4 md:grid-cols-2">{fields.filter((f) => isAdmin || !adminOnly.includes(f.key)).map((field) => <Field key={field.key} label={field.label} hint={field.hint ?? ""} wide={field.multiline ?? false}>{field.multiline ? <Textarea className="min-h-28" value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} /> : <Input value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} />}</Field>)}</div>
+            <div className="grid gap-4 md:grid-cols-2">{fields.filter((f) => canConfigure || !adminOnly.includes(f.key)).map((field) => <Field key={field.key} label={field.label} hint={field.hint ?? ""} wide={field.multiline ?? false}>{field.multiline ? <Textarea className="min-h-28" value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} /> : <Input value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} />}</Field>)}</div>
           </FormSection>
           <div className="sticky bottom-4 flex justify-end rounded-md border border-border bg-card p-3 shadow-sm"><Button size="lg" onClick={simpan} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Save />}{saving ? "Menyimpan…" : "Simpan surat"}</Button></div>
         </div>
