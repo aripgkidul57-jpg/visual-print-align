@@ -90,7 +90,7 @@ export function buildNumber(data: Pick<LetterData, "numberPrefix" | "numberSeque
   const sequence = (data.numberSequence ?? "").trim() || "…";
   const kka = (data.numberKka ?? "").trim();
   const suffix = (data.numberSuffix ?? "").trim();
-  const head = prefix ? `${prefix}-${sequence}` : sequence;
+  const head = prefix ? `${prefix}/${sequence}` : sequence;
   return [head, month, kka, year, suffix].filter(Boolean).join("/");
 }
 

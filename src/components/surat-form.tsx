@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { buildNumber, hariDari, hydrateLetterData, initialLetterData, newLetterDataFromLatest, type LetterData, type Personel } from "@/lib/surat";
@@ -103,12 +104,12 @@ export function SuratForm({ id }: { id?: string }) {
         <div className="mx-auto max-w-5xl space-y-6">
           {error ? <div role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</div> : null}
           <FormSection title="Identitas surat" description="Nomor surat tersusun otomatis dari tanggal yang dipilih.">
-            <div className="grid gap-4 md:grid-cols-5">
-              <Field label="Awalan"><Input value={data.numberPrefix} onChange={(e) => update("numberPrefix", e.target.value)} /></Field>
-              <Field label="Nomor urut"><Input inputMode="numeric" value={data.numberSequence} onChange={(e) => update("numberSequence", e.target.value)} /></Field>
-              <Field label="KKA"><Input value={data.numberKka} onChange={(e) => update("numberKka", e.target.value)} /></Field>
-              <Field label="Tanggal surat"><Input type="date" value={data.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
-              <Field label="Akhiran"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
+            <div className="flex flex-wrap gap-x-4 gap-y-4">
+              <Field label="Awalan" className="w-36"><Input value={data.numberPrefix} onChange={(e) => update("numberPrefix", e.target.value)} /></Field>
+              <Field label="Nomor urut" className="w-28"><Input inputMode="numeric" value={data.numberSequence} onChange={(e) => update("numberSequence", e.target.value)} /></Field>
+              <Field label="KKA" className="w-44"><Input value={data.numberKka} onChange={(e) => update("numberKka", e.target.value)} /></Field>
+              <Field label="Tanggal surat" className="w-48"><Input type="date" value={data.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
+              <Field label="Akhiran" className="min-w-32 flex-1"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
             </div>
             <div className="mt-4 rounded-md bg-muted px-4 py-3 text-sm"><span className="text-muted-foreground">Nomor lengkap</span><strong className="mt-1 block">{buildNumber(data)}</strong></div>
           </FormSection>
@@ -180,6 +181,6 @@ function FormSection({ title, description, children }: { title: string; descript
   return <section className="rounded-md border border-border bg-card"><div className="border-b border-border px-5 py-4"><h2 className="font-bold">{title}</h2><p className="mt-1 text-sm text-muted-foreground">{description}</p></div><div className="p-5">{children}</div></section>;
 }
 
-function Field({ label, hint, wide, children }: { label: string; hint?: string; wide?: boolean; children: React.ReactNode }) {
-  return <label className={wide ? "block md:col-span-2" : "block"}><span className="mb-1.5 block text-sm font-semibold">{label}</span>{children}{hint ? <span className="mt-1 block text-xs text-muted-foreground">{hint}</span> : null}</label>;
+function Field({ label, hint, wide, className, children }: { label: string; hint?: string; wide?: boolean; className?: string; children: React.ReactNode }) {
+  return <label className={cn("block", wide && "md:col-span-2", className)}><span className="mb-1.5 block text-sm font-semibold">{label}</span>{children}{hint ? <span className="mt-1 block text-xs text-muted-foreground">{hint}</span> : null}</label>;
 }
