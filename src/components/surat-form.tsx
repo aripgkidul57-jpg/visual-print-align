@@ -103,12 +103,12 @@ export function SuratForm({ id }: { id?: string }) {
         <div className="mx-auto max-w-5xl space-y-6">
           {error ? <div role="alert" className="rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">{error}</div> : null}
           <FormSection title="Identitas surat" description="Nomor surat tersusun otomatis dari tanggal yang dipilih.">
-            <div className="grid gap-4 md:grid-cols-5">
-              <Field label="Awalan"><Input value={data.numberPrefix} onChange={(e) => update("numberPrefix", e.target.value)} /></Field>
-              <Field label="Nomor urut"><Input inputMode="numeric" value={data.numberSequence} onChange={(e) => update("numberSequence", e.target.value)} /></Field>
-              <Field label="KKA"><Input value={data.numberKka} onChange={(e) => update("numberKka", e.target.value)} /></Field>
-              <Field label="Tanggal surat"><Input type="date" value={data.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
-              <Field label="Akhiran"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
+            <div className="flex flex-wrap gap-x-4 gap-y-4">
+              <Field label="Awalan" className="w-36"><Input value={data.numberPrefix} onChange={(e) => update("numberPrefix", e.target.value)} /></Field>
+              <Field label="Nomor urut" className="w-28"><Input inputMode="numeric" value={data.numberSequence} onChange={(e) => update("numberSequence", e.target.value)} /></Field>
+              <Field label="KKA" className="w-44"><Input value={data.numberKka} onChange={(e) => update("numberKka", e.target.value)} /></Field>
+              <Field label="Tanggal surat" className="w-48"><Input type="date" value={data.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
+              <Field label="Akhiran" className="min-w-32 flex-1"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
             </div>
             <div className="mt-4 rounded-md bg-muted px-4 py-3 text-sm"><span className="text-muted-foreground">Nomor lengkap</span><strong className="mt-1 block">{buildNumber(data)}</strong></div>
           </FormSection>
