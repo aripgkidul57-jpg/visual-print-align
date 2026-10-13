@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { buildNumber, hariDari, hydrateLetterData, initialLetterData, newLetterDataFromLatest, type LetterData, type Personel } from "@/lib/surat";
