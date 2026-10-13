@@ -105,6 +105,19 @@ export function hydrateLetterData(value: unknown): LetterData {
   return { ...initialLetterData, ...(value as Partial<LetterData>) };
 }
 
+const inheritedFields = ["bases", "duties", "city", "authority", "office", "signer", "signerRank", "copyTo"] as const;
+
+export function newLetterDataFromLatest(value: unknown): LetterData {
+  const data = { ...initialLetterData };
+  if (!value || typeof value !== "object" || Array.isArray(value)) return data;
+  const latest = value as Record<string, unknown>;
+  for (const key of inheritedFields) {
+    const saved = latest[key];
+    if (typeof saved === "string") data[key] = saved;
+  }
+  return data;
+}
+
 export const splitLines = (value: string) =>
   (value ?? "").split("\n").filter((line) => line.trim());
 const HARI_ID = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];

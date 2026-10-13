@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Isi delapan kolom surat baru dari surat terakhir dibuat; verifikasi isian dapat diedit dan surat lama tidak berubah.
+
 - [x] Buat form pengisian Surat Perintah.
 - [x] Cocokkan pratinjau A4 dengan dokumen contoh.
 - [x] Tambahkan mode cetak khusus lembar surat.
