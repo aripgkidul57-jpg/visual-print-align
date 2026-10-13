@@ -13,3 +13,4 @@
 - Use shared CSS subgrid columns for letter labels and punctuation so all body colons align with the longest label without a preceding gap.
 - Keep letter typography and physical page geometry in shared print-sheet CSS for identical screen/print layout; use a bundled condensed-font fallback when the document font is unavailable.
 - Render the uploaded letter logo through a CDN asset pointer in the shared LetterPreview and position it within the existing title gap so screen and print geometry remain identical.
+- Initialize new-letter reusable fields through a shared allowlist helper from the latest accessible created_at record; load before editing to avoid overwriting input and keep existing-letter edits independent.

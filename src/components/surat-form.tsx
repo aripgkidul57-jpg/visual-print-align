@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
-import { buildNumber, hariDari, hydrateLetterData, initialLetterData, type LetterData, type Personel } from "@/lib/surat";
+import { buildNumber, hariDari, hydrateLetterData, initialLetterData, newLetterDataFromLatest, type LetterData, type Personel } from "@/lib/surat";
 
 const adminOnly: Array<keyof LetterData> = ["agency","region","resort","duties","city","authority","office","signer","signerRank"];
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [
@@ -26,7 +26,7 @@ export function SuratForm({ id }: { id?: string }) {
   const [data, setData] = useState(initialLetterData);
   const [personel, setPersonel] = useState<Personel[]>([]);
   const [selectedNrp, setSelectedNrp] = useState<string[]>([]);
-  const [loading, setLoading] = useState(Boolean(id));
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const { isAdmin, canConfigure } = useIsAdmin();
@@ -38,16 +38,29 @@ export function SuratForm({ id }: { id?: string }) {
 
   useEffect(() => {
     let active = true;
+    setLoading(true);
+    setError("");
     Promise.all([
       supabase.from("personel").select("nrp, nama, pangkat, jabatan").order("nama"),
-      id ? supabase.from("surat_perintah").select("data, penerima_nrp").eq("id", id).single() : Promise.resolve({ data: null, error: null }),
+      id
+        ? supabase.from("surat_perintah").select("data, penerima_nrp").eq("id", id).single()
+        : supabase.from("surat_perintah").select("data, penerima_nrp").order("created_at", { ascending: false }).order("id", { ascending: false }).limit(1).maybeSingle(),
     ]).then(([people, letter]) => {
       if (!active) return;
       if (people.data) setPersonel(people.data);
-      if (letter.data) {
+      if (id && letter.data) {
         setData(hydrateLetterData(letter.data.data));
         setSelectedNrp(letter.data.penerima_nrp ?? []);
       } else if (id) setError("Surat tidak ditemukan atau tidak dapat dibuka.");
+      else {
+        setData(newLetterDataFromLatest(letter.data?.data));
+        setSelectedNrp([]);
+        if (letter.error) setError("Isian surat terakhir gagal dimuat. Isian awal digunakan; silakan periksa sebelum menyimpan.");
+      }
+      setLoading(false);
+    }).catch(() => {
+      if (!active) return;
+      setError("Data formulir gagal dimuat. Silakan muat ulang halaman.");
       setLoading(false);
     });
     return () => { active = false; };
