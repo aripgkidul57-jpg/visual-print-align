@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { AlertTriangle, Loader2, Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { requireKriteria } from "@/lib/akses";
-import { validasiPersonil, type PersonilInput } from "@/lib/personil-validasi";
+import { adalahNrpSementara, validasiPersonil, type PersonilInput } from "@/lib/personil-validasi";
 
 export const Route = createFileRoute("/_authenticated/personel")({
   beforeLoad: () => requireKriteria(["admin"]),
@@ -37,6 +37,7 @@ function PersonelPage() {
   const [detail, setDetail] = useState<Row | null>(null);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [hanyaSementara, setHanyaSementara] = useState(false);
 
   const muat = async () => {
     const { data, error } = await supabase.from("personel").select("id,nrp,nama,pangkat,jabatan,email,kriteria,status,auth_user_id,updated_at").order("nama");
@@ -70,14 +71,22 @@ function PersonelPage() {
   };
 
   const term = q.trim().toLowerCase();
-  const tampil = rows.filter((r) => (!term || r.nama.toLowerCase().includes(term) || r.nrp.toLowerCase().includes(term)) && (!fk || r.kriteria === fk) && (!fs || r.status === fs));
+  const jumlahSementara = rows.filter((r) => adalahNrpSementara(r.nrp)).length;
+  const tampil = rows.filter((r) => (!term || r.nama.toLowerCase().includes(term) || r.nrp.toLowerCase().includes(term)) && (!fk || r.kriteria === fk) && (!fs || r.status === fs) && (!hanyaSementara || adalahNrpSementara(r.nrp)));
 
   return <AppShell title="Manajemen Data Personil" description="Hanya admin yang dapat mengubah data dan hak akses" action={<Button onClick={() => { setErr(null); setForm({ ...kosong }); }}><Plus />Tambah personil</Button>}>
     <div className="mb-4 flex flex-wrap gap-3">
       <div className="relative min-w-60 flex-1"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input className="pl-9" placeholder="Cari nama atau NRP" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <select aria-label="Filter kriteria" className={selectCls} value={fk} onChange={(e) => setFk(e.target.value)}><option value="">Semua kriteria</option><option value="admin">Admin</option><option value="maintenance">Maintenance</option><option value="user">User</option></select>
       <select aria-label="Filter status" className={selectCls} value={fs} onChange={(e) => setFs(e.target.value)}><option value="">Semua status</option><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select>
+      <button type="button" aria-pressed={hanyaSementara} onClick={() => setHanyaSementara((v) => !v)} className={"h-10 rounded-md border px-3 text-sm " + (hanyaSementara ? "border-destructive bg-destructive/10 text-destructive" : "border-input bg-background")}>Hanya NRP sementara</button>
     </div>
+
+    {jumlahSementara > 0 ? <div className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
+      <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" aria-hidden />
+      <p className="flex-1">{jumlahSementara} personil masih memakai NRP sementara (format ADM-… / USR-…). Buka tombol Ubah pada barisnya lalu ganti dengan NRP asli.</p>
+      {hanyaSementara ? <Button variant="outline" size="sm" onClick={() => setHanyaSementara(false)}>Tampilkan semua</Button> : null}
+    </div> : null}
 
     {form ? <section className="mb-4 rounded-md border border-border bg-card p-5">
       <div className="mb-4 flex items-center justify-between"><h2 className="font-bold">{form.asalNrp ? "Ubah personil" : "Tambah personil"}</h2><Button variant="ghost" size="icon" aria-label="Tutup" onClick={() => setForm(null)}><X /></Button></div>
@@ -87,19 +96,20 @@ function PersonelPage() {
         <label className="block"><span className="mb-1 block text-sm font-semibold">Status</span><select className={selectCls + " w-full"} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as PersonilInput["status"] })}><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select></label>
       </div>
       {err ? <p role="alert" className="mt-3 text-sm text-destructive">{err}</p> : null}
+      {form.asalNrp && adalahNrpSementara(form.asalNrp) ? <p className="mt-3 text-sm text-destructive">NRP ini masih sementara (ADM-… / USR-…). Ganti dengan NRP asli personil.</p> : null}
       <Button className="mt-4" onClick={simpan} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Save />}Simpan</Button>
     </section> : null}
 
     {detail ? <section className="mb-4 rounded-md border border-border bg-card p-5 text-sm">
       <div className="mb-2 flex items-center justify-between"><h2 className="font-bold">{detail.pangkat} {detail.nama}</h2><Button variant="ghost" size="icon" aria-label="Tutup detail" onClick={() => setDetail(null)}><X /></Button></div>
-      <p>NRP: {detail.nrp}</p><p>Jabatan: {detail.jabatan}</p><p>Email: {detail.email || "— (belum bisa login)"}</p><p>Kriteria: {detail.kriteria}</p><p>Status: {detail.status}</p><p>Akun login: {detail.auth_user_id ? "Sudah tertaut" : "Belum pernah login"}</p>
+      <p>NRP: {detail.nrp}{adalahNrpSementara(detail.nrp) ? <> <span className="inline-flex items-center rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs text-destructive">NRP sementara</span></> : null}</p><p>Jabatan: {detail.jabatan}</p><p>Email: {detail.email || "— (belum bisa login)"}</p><p>Kriteria: {detail.kriteria}</p><p>Status: {detail.status}</p><p>Akun login: {detail.auth_user_id ? "Sudah tertaut" : "Belum pernah login"}</p>
     </section> : null}
 
     <div className="overflow-x-auto rounded-md border border-border bg-card"><table className="w-full min-w-[760px] text-left text-sm">
       <thead className="bg-muted/60 text-xs uppercase text-muted-foreground"><tr><th className="px-4 py-3">Nama</th><th className="px-4 py-3">NRP</th><th className="px-4 py-3">Email</th><th className="px-4 py-3">Kriteria</th><th className="px-4 py-3">Status</th><th className="px-4 py-3 text-right">Tindakan</th></tr></thead>
       <tbody className="divide-y divide-border">{tampil.map((r) => <tr key={r.id}>
         <td className="px-4 py-3"><button className="font-semibold hover:underline" onClick={() => setDetail(r)}>{r.nama}</button></td>
-        <td className="px-4 py-3">{r.nrp}</td>
+        <td className="px-4 py-3"><span className={adalahNrpSementara(r.nrp) ? "font-semibold text-destructive" : undefined}>{r.nrp}</span>{adalahNrpSementara(r.nrp) ? <span className="ml-2 inline-flex items-center rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs text-destructive">NRP sementara</span> : null}</td>
         <td className="px-4 py-3 text-muted-foreground">{r.email || <span className="text-destructive">Email belum diisi</span>}</td>
         <td className="px-4 py-3 capitalize">{r.kriteria}</td>
         <td className="px-4 py-3 capitalize">{r.status}</td>
