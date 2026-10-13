@@ -71,7 +71,8 @@ function PersonelPage() {
   };
 
   const term = q.trim().toLowerCase();
-  const tampil = rows.filter((r) => (!term || r.nama.toLowerCase().includes(term) || r.nrp.toLowerCase().includes(term)) && (!fk || r.kriteria === fk) && (!fs || r.status === fs));
+  const jumlahSementara = rows.filter((r) => adalahNrpSementara(r.nrp)).length;
+  const tampil = rows.filter((r) => (!term || r.nama.toLowerCase().includes(term) || r.nrp.toLowerCase().includes(term)) && (!fk || r.kriteria === fk) && (!fs || r.status === fs) && (!hanyaSementara || adalahNrpSementara(r.nrp)));
 
   return <AppShell title="Manajemen Data Personil" description="Hanya admin yang dapat mengubah data dan hak akses" action={<Button onClick={() => { setErr(null); setForm({ ...kosong }); }}><Plus />Tambah personil</Button>}>
     <div className="mb-4 flex flex-wrap gap-3">
