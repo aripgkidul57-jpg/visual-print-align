@@ -79,7 +79,14 @@ function PersonelPage() {
       <div className="relative min-w-60 flex-1"><Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" /><Input className="pl-9" placeholder="Cari nama atau NRP" value={q} onChange={(e) => setQ(e.target.value)} /></div>
       <select aria-label="Filter kriteria" className={selectCls} value={fk} onChange={(e) => setFk(e.target.value)}><option value="">Semua kriteria</option><option value="admin">Admin</option><option value="maintenance">Maintenance</option><option value="user">User</option></select>
       <select aria-label="Filter status" className={selectCls} value={fs} onChange={(e) => setFs(e.target.value)}><option value="">Semua status</option><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select>
+      <button type="button" aria-pressed={hanyaSementara} onClick={() => setHanyaSementara((v) => !v)} className={"h-10 rounded-md border px-3 text-sm " + (hanyaSementara ? "border-destructive bg-destructive/10 text-destructive" : "border-input bg-background")}>Hanya NRP sementara</button>
     </div>
+
+    {jumlahSementara > 0 ? <div className="mb-4 flex flex-wrap items-center gap-3 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm">
+      <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" aria-hidden />
+      <p className="flex-1">{jumlahSementara} personil masih memakai NRP sementara (format ADM-… / USR-…). Buka tombol Ubah pada barisnya lalu ganti dengan NRP asli.</p>
+      {hanyaSementara ? <Button variant="outline" size="sm" onClick={() => setHanyaSementara(false)}>Tampilkan semua</Button> : null}
+    </div> : null}
 
     {form ? <section className="mb-4 rounded-md border border-border bg-card p-5">
       <div className="mb-4 flex items-center justify-between"><h2 className="font-bold">{form.asalNrp ? "Ubah personil" : "Tambah personil"}</h2><Button variant="ghost" size="icon" aria-label="Tutup" onClick={() => setForm(null)}><X /></Button></div>
