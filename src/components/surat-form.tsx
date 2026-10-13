@@ -180,6 +180,6 @@ function FormSection({ title, description, children }: { title: string; descript
   return <section className="rounded-md border border-border bg-card"><div className="border-b border-border px-5 py-4"><h2 className="font-bold">{title}</h2><p className="mt-1 text-sm text-muted-foreground">{description}</p></div><div className="p-5">{children}</div></section>;
 }
 
-function Field({ label, hint, wide, children }: { label: string; hint?: string; wide?: boolean; children: React.ReactNode }) {
-  return <label className={wide ? "block md:col-span-2" : "block"}><span className="mb-1.5 block text-sm font-semibold">{label}</span>{children}{hint ? <span className="mt-1 block text-xs text-muted-foreground">{hint}</span> : null}</label>;
+function Field({ label, hint, wide, className, children }: { label: string; hint?: string; wide?: boolean; className?: string; children: React.ReactNode }) {
+  return <label className={cn("block", wide && "md:col-span-2", className)}><span className="mb-1.5 block text-sm font-semibold">{label}</span>{children}{hint ? <span className="mt-1 block text-xs text-muted-foreground">{hint}</span> : null}</label>;
 }
