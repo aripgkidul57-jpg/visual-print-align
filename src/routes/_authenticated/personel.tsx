@@ -37,6 +37,7 @@ function PersonelPage() {
   const [detail, setDetail] = useState<Row | null>(null);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [hanyaSementara, setHanyaSementara] = useState(false);
 
   const muat = async () => {
     const { data, error } = await supabase.from("personel").select("id,nrp,nama,pangkat,jabatan,email,kriteria,status,auth_user_id,updated_at").order("nama");
