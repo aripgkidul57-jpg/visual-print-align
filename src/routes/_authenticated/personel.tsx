@@ -96,6 +96,7 @@ function PersonelPage() {
         <label className="block"><span className="mb-1 block text-sm font-semibold">Status</span><select className={selectCls + " w-full"} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as PersonilInput["status"] })}><option value="aktif">Aktif</option><option value="nonaktif">Nonaktif</option></select></label>
       </div>
       {err ? <p role="alert" className="mt-3 text-sm text-destructive">{err}</p> : null}
+      {form.asalNrp && adalahNrpSementara(form.asalNrp) ? <p className="mt-3 text-sm text-destructive">NRP ini masih sementara (ADM-… / USR-…). Ganti dengan NRP asli personil.</p> : null}
       <Button className="mt-4" onClick={simpan} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Save />}Simpan</Button>
     </section> : null}
 
