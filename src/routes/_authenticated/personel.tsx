@@ -101,7 +101,7 @@ function PersonelPage() {
 
     {detail ? <section className="mb-4 rounded-md border border-border bg-card p-5 text-sm">
       <div className="mb-2 flex items-center justify-between"><h2 className="font-bold">{detail.pangkat} {detail.nama}</h2><Button variant="ghost" size="icon" aria-label="Tutup detail" onClick={() => setDetail(null)}><X /></Button></div>
-      <p>NRP: {detail.nrp}</p><p>Jabatan: {detail.jabatan}</p><p>Email: {detail.email || "— (belum bisa login)"}</p><p>Kriteria: {detail.kriteria}</p><p>Status: {detail.status}</p><p>Akun login: {detail.auth_user_id ? "Sudah tertaut" : "Belum pernah login"}</p>
+      <p>NRP: {detail.nrp}{adalahNrpSementara(detail.nrp) ? <> <span className="inline-flex items-center rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs text-destructive">NRP sementara</span></> : null}</p><p>Jabatan: {detail.jabatan}</p><p>Email: {detail.email || "— (belum bisa login)"}</p><p>Kriteria: {detail.kriteria}</p><p>Status: {detail.status}</p><p>Akun login: {detail.auth_user_id ? "Sudah tertaut" : "Belum pernah login"}</p>
     </section> : null}
 
     <div className="overflow-x-auto rounded-md border border-border bg-card"><table className="w-full min-w-[760px] text-left text-sm">
