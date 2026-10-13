@@ -3,6 +3,11 @@ export type PersonilInput = {
   kriteria: "admin" | "maintenance" | "user"; status: "aktif" | "nonaktif";
 };
 
+/** NRP otomatis yang dibuat sistem saat migrasi akun lama — wajib diganti NRP asli. */
+export function adalahNrpSementara(nrp: string): boolean {
+  return /^(ADM|USR)-[0-9]+$/.test(nrp.trim().toUpperCase());
+}
+
 export function validasiPersonil(p: PersonilInput): string | null {
   if (!/^[0-9A-Za-z.-]{3,30}$/.test(p.nrp.trim())) return "NRP wajib diisi (3–30 karakter, angka/huruf).";
   if (!p.nama.trim()) return "Nama wajib diisi.";
