@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Loader2, Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { AlertTriangle, Loader2, Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { requireKriteria } from "@/lib/akses";
-import { validasiPersonil, type PersonilInput } from "@/lib/personil-validasi";
+import { adalahNrpSementara, validasiPersonil, type PersonilInput } from "@/lib/personil-validasi";
 
 export const Route = createFileRoute("/_authenticated/personel")({
   beforeLoad: () => requireKriteria(["admin"]),
