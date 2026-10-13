@@ -108,7 +108,7 @@ function PersonelPage() {
       <thead className="bg-muted/60 text-xs uppercase text-muted-foreground"><tr><th className="px-4 py-3">Nama</th><th className="px-4 py-3">NRP</th><th className="px-4 py-3">Email</th><th className="px-4 py-3">Kriteria</th><th className="px-4 py-3">Status</th><th className="px-4 py-3 text-right">Tindakan</th></tr></thead>
       <tbody className="divide-y divide-border">{tampil.map((r) => <tr key={r.id}>
         <td className="px-4 py-3"><button className="font-semibold hover:underline" onClick={() => setDetail(r)}>{r.nama}</button></td>
-        <td className="px-4 py-3">{r.nrp}</td>
+        <td className="px-4 py-3"><span className={adalahNrpSementara(r.nrp) ? "font-semibold text-destructive" : undefined}>{r.nrp}</span>{adalahNrpSementara(r.nrp) ? <span className="ml-2 inline-flex items-center rounded-full border border-destructive/40 bg-destructive/10 px-2 py-0.5 text-xs text-destructive">NRP sementara</span> : null}</td>
         <td className="px-4 py-3 text-muted-foreground">{r.email || <span className="text-destructive">Email belum diisi</span>}</td>
         <td className="px-4 py-3 capitalize">{r.kriteria}</td>
         <td className="px-4 py-3 capitalize">{r.status}</td>
