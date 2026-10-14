@@ -17,7 +17,7 @@ const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean;
   { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
   { key: "city", label: "Dikeluarkan di" }, { key: "authority", label: "Atas nama" },
   { key: "office", label: "Jabatan penanda tangan" }, { key: "signer", label: "Nama penanda tangan" },
-  { key: "signerRank", label: "Pangkat / NRP" }, { key: "copyTo", label: "Tembusan" },
+  { key: "signerRank", label: "Pangkat / NRP" },
 ];
 
 export function SuratForm({ id }: { id?: string }) {
