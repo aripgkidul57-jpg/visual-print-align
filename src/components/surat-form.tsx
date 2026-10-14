@@ -187,3 +187,19 @@ function FormSection({ title, description, children }: { title: string; descript
 function Field({ label, hint, wide, className, children }: { label: string; hint?: string; wide?: boolean; className?: string; children: React.ReactNode }) {
   return <label className={cn("block", wide && "md:col-span-2", className)}><span className="mb-1.5 block text-sm font-semibold">{label}</span>{children}{hint ? <span className="mt-1 block text-xs text-muted-foreground">{hint}</span> : null}</label>;
 }
+
+function ButirList({ value, onChange, noun }: { value: string; onChange: (value: string) => void; noun: string }) {
+  const lines = value.split("\n");
+  return (
+    <div className="space-y-2">
+      {lines.map((line, index) => (
+        <div key={index} className="flex items-start gap-2">
+          <span className="mt-2.5 w-6 shrink-0 text-right text-sm text-muted-foreground">{index + 1}.</span>
+          <Textarea className="min-h-10 flex-1" rows={1} value={line} onChange={(e) => onChange(lines.map((l, i) => (i === index ? e.target.value : l)).join("\n"))} />
+          <Button type="button" variant="ghost" size="icon" aria-label={`Hapus butir ${noun}`} disabled={lines.length <= 1} onClick={() => onChange(lines.filter((_, i) => i !== index).join("\n"))}><Trash2 className="h-4 w-4" /></Button>
+        </div>
+      ))}
+      <Button type="button" variant="outline" size="sm" onClick={() => onChange(`${value}\n`)}><Plus />Tambah butir {noun}</Button>
+    </div>
+  );
+}
