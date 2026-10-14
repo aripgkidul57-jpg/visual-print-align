@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { homeFor, type Kriteria } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
 import { mintaOtp } from "@/lib/akses.functions";
+import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -114,6 +115,14 @@ function AuthPage() {
             <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
             {pesan ? <p className={`text-sm ${pesan.jenis === "error" ? "text-destructive" : "text-muted-foreground"}`} role="status">{pesan.teks}</p> : null}
             <Button type="submit" size="lg" className="w-full" disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : null}Kirim kode OTP</Button>
+            <div className="flex items-center gap-2 py-1 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />atau<span className="h-px flex-1 bg-border" /></div>
+            <Button type="button" variant="outline" size="lg" className="w-full" disabled={busy} onClick={async () => {
+              setBusy(true); setPesan(null);
+              const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+              if (r.error) { setPesan({ jenis: "error", teks: "Masuk dengan Google gagal. Coba lagi." }); setBusy(false); return; }
+              if (!r.redirected) await periksaAkses();
+              setBusy(false);
+            }}>Masuk dengan Google</Button>
           </form>
         ) : (
           <form onSubmit={verifikasi} className="mt-6 space-y-3">
