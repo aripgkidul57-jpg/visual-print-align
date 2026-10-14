@@ -15,7 +15,6 @@ const adminOnly: Array<keyof LetterData> = ["agency","region","resort","duties",
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [
   { key: "agency", label: "Instansi" }, { key: "region", label: "Daerah" }, { key: "resort", label: "Kesatuan" },
   { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
-  { key: "bases", label: "Dasar", multiline: true, hint: "Satu butir per baris" },
   { key: "duties", label: "Untuk", multiline: true, hint: "Satu butir per baris" },
   { key: "city", label: "Dikeluarkan di" }, { key: "authority", label: "Atas nama" },
   { key: "office", label: "Jabatan penanda tangan" }, { key: "signer", label: "Nama penanda tangan" },
