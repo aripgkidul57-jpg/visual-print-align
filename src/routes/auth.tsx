@@ -7,16 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { homeFor, type Kriteria } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
-import { mintaOtp } from "@/lib/akses.functions";
 import { lovable } from "@/integrations/lovable";
+import { masukNrp } from "@/lib/sandi.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Masuk — Surat Perintah Polres Situbondo" },
-      { name: "description", content: "Masuk dengan kode OTP email untuk personil terdaftar." },
+      { name: "description", content: "Masuk dengan NRP dan kata sandi atau akun Google untuk personil terdaftar." },
       { property: "og:title", content: "Masuk — Surat Perintah Polres Situbondo" },
-      { property: "og:description", content: "Masuk dengan kode OTP email untuk personil terdaftar." },
+      { property: "og:description", content: "Masuk dengan NRP dan kata sandi atau akun Google untuk personil terdaftar." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -31,20 +31,18 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-const DITOLAK = "Akses ditolak. Email Anda tidak terdaftar sebagai personil aktif. Hubungi admin.";
+const DITOLAK = "Akses ditolak. Akun Anda tidak terdaftar sebagai personil aktif. Hubungi admin.";
 
 function AuthPage() {
   const navigate = useNavigate();
   const { next, error: errParam } = Route.useSearch();
-  const kirim = useServerFn(mintaOtp);
-  const [tahap, setTahap] = useState<"email" | "kode">("email");
-  const [email, setEmail] = useState("");
-  const [kode, setKode] = useState("");
+  const masuk = useServerFn(masukNrp);
+  const [nrp, setNrp] = useState("");
+  const [sandi, setSandi] = useState("");
   const [busy, setBusy] = useState(false);
-  const [pesan, setPesan] = useState<{ jenis: "error" | "info"; teks: string } | null>(errParam ? { jenis: "error", teks: DITOLAK } : null);
+  const [pesan, setPesan] = useState<string | null>(errParam ? DITOLAK : null);
   const checking = useRef(false);
 
-  // Setelah sesi ada: cocokkan dengan data personil di database.
   const periksaAkses = async () => {
     if (checking.current) return;
     checking.current = true;
@@ -53,8 +51,7 @@ function AuthPage() {
     checking.current = false;
     if (!k) {
       await supabase.auth.signOut();
-      setPesan({ jenis: "error", teks: DITOLAK });
-      setTahap("email");
+      setPesan(DITOLAK);
       return;
     }
     if (next) window.location.href = next;
@@ -70,31 +67,24 @@ function AuthPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const mintaKode = async (e: FormEvent) => {
+  const kirim = async (e: FormEvent) => {
     e.preventDefault();
     setBusy(true); setPesan(null);
     try {
-      const r = await kirim({ data: { email, redirectTo: window.location.origin + "/auth" + (next ? `?next=${encodeURIComponent(next)}` : "") } });
-      if (r && "rateLimited" in r && r.rateLimited) {
-        setPesan({ jenis: "error", teks: "Terlalu banyak permintaan kode. Tunggu beberapa menit lalu coba lagi." });
-      } else {
-        setTahap("kode");
-        setPesan({ jenis: "info", teks: "Jika email terdaftar sebagai personil aktif, kode OTP telah dikirim. Cek kotak masuk (atau klik tautan di email)." });
-      }
+      const r = await masuk({ data: { nrp, sandi } });
+      if (!r.ok) setPesan(r.pesan);
+      else await supabase.auth.setSession({ access_token: r.access_token, refresh_token: r.refresh_token });
     } catch (err) {
-      setPesan({ jenis: "error", teks: err instanceof Error ? err.message : "Gagal mengirim kode." });
+      setPesan(err instanceof Error ? err.message : "Gagal masuk.");
     }
     setBusy(false);
   };
 
-  const verifikasi = async (e: FormEvent) => {
-    e.preventDefault();
+  const google = async () => {
     setBusy(true); setPesan(null);
-    const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: kode.trim(), type: "email" });
-    if (error) {
-      const m = error.message.toLowerCase();
-      setPesan({ jenis: "error", teks: m.includes("expired") ? "Kode OTP sudah kedaluwarsa. Minta kode baru." : m.includes("invalid") ? "Kode OTP salah. Periksa kembali." : error.status === 429 ? "Terlalu banyak percobaan. Tunggu sebentar." : "Verifikasi gagal. Coba lagi." });
-    }
+    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
+    if (r.error) { setPesan("Masuk dengan Google gagal. Coba lagi."); setBusy(false); return; }
+    if (!r.redirected) await periksaAkses();
     setBusy(false);
   };
 
@@ -109,31 +99,21 @@ function AuthPage() {
           <p className="mt-1 text-sm text-muted-foreground">Surat Perintah — Polres Situbondo</p>
         </div>
 
-        {tahap === "email" ? (
-          <form onSubmit={mintaKode} className="mt-6 space-y-3">
-            <label htmlFor="email" className="mb-1 block text-sm font-medium">Email personil</label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
-            {pesan ? <p className={`text-sm ${pesan.jenis === "error" ? "text-destructive" : "text-muted-foreground"}`} role="status">{pesan.teks}</p> : null}
-            <Button type="submit" size="lg" className="w-full" disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : null}Kirim kode OTP</Button>
-            <div className="flex items-center gap-2 py-1 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />atau<span className="h-px flex-1 bg-border" /></div>
-            <Button type="button" variant="outline" size="lg" className="w-full" disabled={busy} onClick={async () => {
-              setBusy(true); setPesan(null);
-              const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
-              if (r.error) { setPesan({ jenis: "error", teks: "Masuk dengan Google gagal. Coba lagi." }); setBusy(false); return; }
-              if (!r.redirected) await periksaAkses();
-              setBusy(false);
-            }}>Masuk dengan Google</Button>
-          </form>
-        ) : (
-          <form onSubmit={verifikasi} className="mt-6 space-y-3">
-            <label htmlFor="kode" className="mb-1 block text-sm font-medium">Kode OTP untuk {email}</label>
-            <Input id="kode" inputMode="numeric" autoComplete="one-time-code" value={kode} onChange={(e) => setKode(e.target.value.replace(/\D/g, "").slice(0, 10))} required minLength={6} />
-            {pesan ? <p className={`text-sm ${pesan.jenis === "error" ? "text-destructive" : "text-muted-foreground"}`} role="status">{pesan.teks}</p> : null}
-            <Button type="submit" size="lg" className="w-full" disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : null}Verifikasi & masuk</Button>
-            <Button type="button" variant="ghost" className="w-full" onClick={() => { setTahap("email"); setKode(""); setPesan(null); }}>Ganti email / kirim ulang</Button>
-          </form>
-        )}
-        <p className="mt-4 text-center text-xs text-muted-foreground">Akun hanya dibuat oleh admin. Tidak ada pendaftaran mandiri.</p>
+        <form onSubmit={kirim} className="mt-6 space-y-3">
+          <div>
+            <label htmlFor="nrp" className="mb-1 block text-sm font-medium">NRP</label>
+            <Input id="nrp" value={nrp} onChange={(e) => setNrp(e.target.value)} required autoComplete="username" />
+          </div>
+          <div>
+            <label htmlFor="sandi" className="mb-1 block text-sm font-medium">Kata sandi</label>
+            <Input id="sandi" type="password" value={sandi} onChange={(e) => setSandi(e.target.value)} required autoComplete="current-password" />
+          </div>
+          {pesan ? <p className="text-sm text-destructive" role="status">{pesan}</p> : null}
+          <Button type="submit" size="lg" className="w-full" disabled={busy}>{busy ? <Loader2 className="animate-spin" /> : null}Masuk</Button>
+          <div className="flex items-center gap-2 py-1 text-xs text-muted-foreground"><span className="h-px flex-1 bg-border" />atau<span className="h-px flex-1 bg-border" /></div>
+          <Button type="button" variant="outline" size="lg" className="w-full" disabled={busy} onClick={google}>Masuk dengan Google</Button>
+        </form>
+        <p className="mt-4 text-center text-xs text-muted-foreground">Kata sandi dibuat oleh admin. Tidak ada pendaftaran mandiri.</p>
       </div>
     </main>
   );
