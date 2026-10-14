@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Loader2, Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { AlertTriangle, KeyRound, Loader2, Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { aturSandi } from "@/lib/sandi.functions";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -29,6 +31,7 @@ const kosong: PersonilInput = { nrp: "", nama: "", pangkat: "", jabatan: "", ema
 const selectCls = "h-10 rounded-md border border-input bg-background px-3 text-sm";
 
 function PersonelPage() {
+  const atur = useServerFn(aturSandi);
   const [rows, setRows] = useState<Row[]>([]);
   const [q, setQ] = useState("");
   const [fk, setFk] = useState("");
@@ -114,6 +117,12 @@ function PersonelPage() {
         <td className="px-4 py-3 capitalize">{r.kriteria}</td>
         <td className="px-4 py-3 capitalize">{r.status}</td>
         <td className="px-4 py-2"><div className="flex justify-end gap-1">
+          <Button variant="ghost" size="icon" title="Atur kata sandi" onClick={async () => {
+            const s = window.prompt(`Kata sandi baru untuk ${r.nama} (NRP ${r.nrp}), minimal 8 karakter:`);
+            if (!s) return;
+            try { await atur({ data: { nrp: r.nrp, sandi: s } }); toast.success("Kata sandi disimpan. Personil bisa masuk dengan NRP dan kata sandi ini."); }
+            catch (e) { toast.error(e instanceof Error ? e.message : "Gagal menyimpan kata sandi."); }
+          }}><KeyRound /></Button>
           <Button variant="ghost" size="icon" title="Ubah" onClick={() => { setErr(null); setForm({ nrp: r.nrp, nama: r.nama, pangkat: r.pangkat, jabatan: r.jabatan, email: r.email, kriteria: r.kriteria, status: r.status, asalNrp: r.nrp }); }}><Pencil /></Button>
           <AlertDialog><AlertDialogTrigger asChild><Button variant="ghost" size="icon" title="Hapus" className="text-destructive hover:text-destructive"><Trash2 /></Button></AlertDialogTrigger>
             <AlertDialogContent><AlertDialogHeader><AlertDialogTitle>Hapus personil ini?</AlertDialogTitle><AlertDialogDescription>{r.nama} (NRP {r.nrp}) akan dihapus dan tidak bisa login lagi.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>Batal</AlertDialogCancel><AlertDialogAction onClick={() => hapus(r.nrp)}>Hapus</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
