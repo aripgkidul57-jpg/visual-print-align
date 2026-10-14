@@ -15,7 +15,6 @@ const adminOnly: Array<keyof LetterData> = ["agency","region","resort","duties",
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [
   { key: "agency", label: "Instansi" }, { key: "region", label: "Daerah" }, { key: "resort", label: "Kesatuan" },
   { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
-  { key: "bases", label: "Dasar", multiline: true, hint: "Satu butir per baris" },
   { key: "duties", label: "Untuk", multiline: true, hint: "Satu butir per baris" },
   { key: "city", label: "Dikeluarkan di" }, { key: "authority", label: "Atas nama" },
   { key: "office", label: "Jabatan penanda tangan" }, { key: "signer", label: "Nama penanda tangan" },
@@ -167,8 +166,22 @@ export function SuratForm({ id }: { id?: string }) {
               <Field label="Jam selesai tugas"><Input type="time" value={data.endTime} onChange={(e) => update("endTime", e.target.value)} /></Field>
             </div>
           </FormSection>
-          <FormSection title="Isi dan penandatangan" description="Gunakan satu baris untuk setiap butir pada kolom Dasar dan Untuk.">
-            <div className="grid gap-4 md:grid-cols-2">{fields.filter((f) => canConfigure || !adminOnly.includes(f.key)).map((field) => <Field key={field.key} label={field.label} hint={field.hint ?? ""} wide={field.multiline ?? false}>{field.multiline ? <Textarea className="min-h-28" value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} /> : <Input value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} />}</Field>)}</div>
+          <FormSection title="Isi dan penandatangan" description="Dasar diisi per butir; gunakan satu baris untuk setiap butir pada kolom Untuk.">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Field label="Dasar" wide>
+                <div className="space-y-2">
+                  {data.bases.split("\n").map((line, index, lines) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <span className="mt-2.5 w-6 shrink-0 text-right text-sm text-muted-foreground">{index + 1}.</span>
+                      <Textarea className="min-h-10 flex-1" rows={1} value={line} onChange={(e) => update("bases", lines.map((l, i) => (i === index ? e.target.value : l)).join("\n"))} />
+                      <Button type="button" variant="ghost" size="icon" aria-label="Hapus butir dasar" disabled={lines.length <= 1} onClick={() => update("bases", lines.filter((_, i) => i !== index).join("\n"))}><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                  ))}
+                  <Button type="button" variant="outline" size="sm" onClick={() => update("bases", `${data.bases}\n`)}><Plus />Tambah butir dasar</Button>
+                </div>
+              </Field>
+              {fields.filter((f) => canConfigure || !adminOnly.includes(f.key)).map((field) => <Field key={field.key} label={field.label} hint={field.hint ?? ""} wide={field.multiline ?? false}>{field.multiline ? <Textarea className="min-h-28" value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} /> : <Input value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} />}</Field>)}
+            </div>
           </FormSection>
           <div className="sticky bottom-4 flex justify-end rounded-md border border-border bg-card p-3 shadow-sm"><Button size="lg" onClick={simpan} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Save />}{saving ? "Menyimpan…" : "Simpan surat"}</Button></div>
         </div>
