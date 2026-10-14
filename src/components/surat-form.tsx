@@ -15,10 +15,9 @@ const adminOnly: Array<keyof LetterData> = ["agency","region","resort","duties",
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [
   { key: "agency", label: "Instansi" }, { key: "region", label: "Daerah" }, { key: "resort", label: "Kesatuan" },
   { key: "tugas", label: "Tugas", multiline: true, hint: "Dipakai pada bagian Pertimbangan dan butir pertama Untuk" },
-  { key: "duties", label: "Untuk", multiline: true, hint: "Satu butir per baris" },
   { key: "city", label: "Dikeluarkan di" }, { key: "authority", label: "Atas nama" },
   { key: "office", label: "Jabatan penanda tangan" }, { key: "signer", label: "Nama penanda tangan" },
-  { key: "signerRank", label: "Pangkat / NRP" }, { key: "copyTo", label: "Tembusan" },
+  { key: "signerRank", label: "Pangkat / NRP" },
 ];
 
 export function SuratForm({ id }: { id?: string }) {
@@ -168,19 +167,10 @@ export function SuratForm({ id }: { id?: string }) {
           </FormSection>
           <FormSection title="Isi dan penandatangan" description="Dasar diisi per butir; gunakan satu baris untuk setiap butir pada kolom Untuk.">
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Dasar" wide>
-                <div className="space-y-2">
-                  {data.bases.split("\n").map((line, index, lines) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <span className="mt-2.5 w-6 shrink-0 text-right text-sm text-muted-foreground">{index + 1}.</span>
-                      <Textarea className="min-h-10 flex-1" rows={1} value={line} onChange={(e) => update("bases", lines.map((l, i) => (i === index ? e.target.value : l)).join("\n"))} />
-                      <Button type="button" variant="ghost" size="icon" aria-label="Hapus butir dasar" disabled={lines.length <= 1} onClick={() => update("bases", lines.filter((_, i) => i !== index).join("\n"))}><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-                  ))}
-                  <Button type="button" variant="outline" size="sm" onClick={() => update("bases", `${data.bases}\n`)}><Plus />Tambah butir dasar</Button>
-                </div>
-              </Field>
+              <Field label="Dasar" wide><ButirList value={data.bases} onChange={(v) => update("bases", v)} noun="dasar" /></Field>
+              <Field label="Untuk" hint="Butir pertama (melaksanakan kegiatan) dibuat otomatis dari kolom Tugas" wide><ButirList value={data.duties} onChange={(v) => update("duties", v)} noun="untuk" /></Field>
               {fields.filter((f) => canConfigure || !adminOnly.includes(f.key)).map((field) => <Field key={field.key} label={field.label} hint={field.hint ?? ""} wide={field.multiline ?? false}>{field.multiline ? <Textarea className="min-h-28" value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} /> : <Input value={data[field.key]} onChange={(e) => update(field.key, e.target.value)} />}</Field>)}
+              <Field label="Tembusan" hint="Satu butir tampil tanpa nomor di lembar surat; lebih dari satu butir tampil bernomor" wide><ButirList value={data.copyTo} onChange={(v) => update("copyTo", v)} noun="tembusan" /></Field>
             </div>
           </FormSection>
           <div className="sticky bottom-4 flex justify-end rounded-md border border-border bg-card p-3 shadow-sm"><Button size="lg" onClick={simpan} disabled={saving}>{saving ? <Loader2 className="animate-spin" /> : <Save />}{saving ? "Menyimpan…" : "Simpan surat"}</Button></div>
@@ -196,4 +186,20 @@ function FormSection({ title, description, children }: { title: string; descript
 
 function Field({ label, hint, wide, className, children }: { label: string; hint?: string; wide?: boolean; className?: string; children: React.ReactNode }) {
   return <label className={cn("block", wide && "md:col-span-2", className)}><span className="mb-1.5 block text-sm font-semibold">{label}</span>{children}{hint ? <span className="mt-1 block text-xs text-muted-foreground">{hint}</span> : null}</label>;
+}
+
+function ButirList({ value, onChange, noun }: { value: string; onChange: (value: string) => void; noun: string }) {
+  const lines = value.split("\n");
+  return (
+    <div className="space-y-2">
+      {lines.map((line, index) => (
+        <div key={index} className="flex items-start gap-2">
+          <span className="mt-2.5 w-6 shrink-0 text-right text-sm text-muted-foreground">{index + 1}.</span>
+          <Textarea className="min-h-10 flex-1" rows={1} value={line} onChange={(e) => onChange(lines.map((l, i) => (i === index ? e.target.value : l)).join("\n"))} />
+          <Button type="button" variant="ghost" size="icon" aria-label={`Hapus butir ${noun}`} disabled={lines.length <= 1} onClick={() => onChange(lines.filter((_, i) => i !== index).join("\n"))}><Trash2 className="h-4 w-4" /></Button>
+        </div>
+      ))}
+      <Button type="button" variant="outline" size="sm" onClick={() => onChange(`${value}\n`)}><Plus />Tambah butir {noun}</Button>
+    </div>
+  );
 }
