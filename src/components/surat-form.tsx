@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
-import { buildNumber, hariDari, hydrateLetterData, initialLetterData, newLetterDataFromLatest, type LetterData, type Personel } from "@/lib/surat";
+import { BIDANG_OPTIONS, buildNumber, hariDari, hydrateLetterData, initialLetterData, newLetterDataFromLatest, type LetterData, type Personel } from "@/lib/surat";
 
 const adminOnly: Array<keyof LetterData> = ["agency","region","resort","duties","city","authority","office","signer","signerRank"];
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [

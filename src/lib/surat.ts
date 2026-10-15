@@ -118,18 +118,11 @@ export function hydrateLetterData(value: unknown): LetterData {
   return { ...initialLetterData, ...(value as Partial<LetterData>) };
 }
 
-const inheritedFields = ["bases", "duties", "city", "authority", "office", "signer", "signerRank", "copyTo"] as const;
-
-export function newLetterDataFromLatest(value: unknown): LetterData {
-  const data = { ...initialLetterData };
+// Isian surat baru dikosongkan; hanya tanggal surat yang terisi tanggal hari ini.
+export function newLetterDataFromLatest(_value: unknown): LetterData {
+  const data = Object.fromEntries(Object.keys(initialLetterData).map((key) => [key, ""])) as unknown as LetterData;
   const now = new Date();
   data.issueDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  if (!value || typeof value !== "object" || Array.isArray(value)) return data;
-  const latest = value as Record<string, unknown>;
-  for (const key of inheritedFields) {
-    const saved = latest[key];
-    if (typeof saved === "string") data[key] = saved;
-  }
   return data;
 }
 
