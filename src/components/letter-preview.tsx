@@ -24,7 +24,7 @@ export function LetterPreview({ data, recipients }: { data: LetterData; recipien
           <div className="signature-office"><p>{data.authority}</p><p>{data.office}</p></div>
           <div className="signature-name"><p>{data.signer}</p><p>{data.signerRank}</p></div>
         </div>
-        <div className="copies"><p>Tembusan:</p><p>{data.copyTo}</p></div>
+        <div className="copies"><p>Tembusan:</p>{(() => { const items = splitLines(data.copyTo); return items.length > 1 ? <ol className="document-list">{items.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol> : <p>{items[0] ?? ""}</p>; })()}</div>
       </div>
     </article>
   );
