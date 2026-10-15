@@ -109,6 +109,8 @@ const inheritedFields = ["bases", "duties", "city", "authority", "office", "sign
 
 export function newLetterDataFromLatest(value: unknown): LetterData {
   const data = { ...initialLetterData };
+  const now = new Date();
+  data.issueDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   if (!value || typeof value !== "object" || Array.isArray(value)) return data;
   const latest = value as Record<string, unknown>;
   for (const key of inheritedFields) {
