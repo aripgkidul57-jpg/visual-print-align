@@ -107,7 +107,7 @@ export function SuratForm({ id }: { id?: string }) {
               <Field label="Nomor urut" className="w-28"><Input inputMode="numeric" value={data.numberSequence} onChange={(e) => update("numberSequence", e.target.value)} /></Field>
               <Field label="KKA" className="w-44"><Input value={data.numberKka} onChange={(e) => update("numberKka", e.target.value)} /></Field>
               <Field label="Tanggal surat" className="w-48"><Input type="date" value={data.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
-              <Field label="Akhiran" className="min-w-32 flex-1"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
+              {canConfigure ? <Field label="Akhiran" className="min-w-32 flex-1"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field> : null}
             </div>
             <div className="mt-4 rounded-md bg-muted px-4 py-3 text-sm"><span className="text-muted-foreground">Nomor lengkap</span><strong className="mt-1 block">{buildNumber(data)}</strong></div>
           </FormSection>
