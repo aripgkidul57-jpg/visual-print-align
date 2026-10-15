@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useIsAdmin } from "@/hooks/use-is-admin";
 import { supabase } from "@/integrations/supabase/client";
-import { BIDANG_OPTIONS, buildNumber, hariDari, hydrateLetterData, initialLetterData, newLetterDataFromLatest, type LetterData, type Personel } from "@/lib/surat";
+import { buildNumber, hariDari, hydrateLetterData, initialLetterData, newLetterDataFromLatest, type LetterData, type Personel } from "@/lib/surat";
 
 const adminOnly: Array<keyof LetterData> = ["agency","region","resort","duties","city","authority","office","signer","signerRank"];
 const fields: Array<{ key: keyof LetterData; label: string; multiline?: boolean; hint?: string }> = [
@@ -107,13 +107,7 @@ export function SuratForm({ id }: { id?: string }) {
               <Field label="Nomor urut" className="w-28"><Input inputMode="numeric" value={data.numberSequence} onChange={(e) => update("numberSequence", e.target.value)} /></Field>
               <Field label="KKA" className="w-44"><Input value={data.numberKka} onChange={(e) => update("numberKka", e.target.value)} /></Field>
               <Field label="Tanggal surat" className="w-48"><Input type="date" value={data.issueDate} onChange={(e) => update("issueDate", e.target.value)} /></Field>
-              {canConfigure ? <Field label="Akhiran" className="min-w-32 flex-1"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field> : null}
-              <Field label="Bidang Tugas" className="w-56">
-                <select className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm" value={data.bidang} onChange={(e) => update("bidang", e.target.value)}>
-                  <option value="">Pilih bidang…</option>
-                  {BIDANG_OPTIONS.map((b) => <option key={b} value={b}>{b}</option>)}
-                </select>
-              </Field>
+              <Field label="Akhiran" className="min-w-32 flex-1"><Input value={data.numberSuffix} onChange={(e) => update("numberSuffix", e.target.value)} /></Field>
             </div>
             <div className="mt-4 rounded-md bg-muted px-4 py-3 text-sm"><span className="text-muted-foreground">Nomor lengkap</span><strong className="mt-1 block">{buildNumber(data)}</strong></div>
           </FormSection>

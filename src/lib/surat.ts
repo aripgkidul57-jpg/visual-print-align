@@ -29,19 +29,7 @@ export type LetterData = {
   signer: string;
   signerRank: string;
   copyTo: string;
-  bidang: string;
 };
-
-export const BIDANG_OPTIONS = [
-  "Kasat",
-  "Urbinopsnal",
-  "Urmintu",
-  "Uryanmin",
-  "Unit 1 (Politik)",
-  "Unit 2 (Ekonomi)",
-  "Unit 3 (Sosbud)",
-  "Unit 4 (Keamanan)",
-];
 
 export type SuratRecord = {
   id: string;
@@ -80,7 +68,6 @@ export const initialLetterData: LetterData = {
   signer: "MOHAMAD DJUPRI",
   signerRank: "INSPEKTUR POLISI SATU NRP 68020388",
   copyTo: "Kapolres Situbondo.",
-  bidang: "",
 };
 
 const ROMAWI = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
@@ -118,11 +105,16 @@ export function hydrateLetterData(value: unknown): LetterData {
   return { ...initialLetterData, ...(value as Partial<LetterData>) };
 }
 
-// Isian surat baru dikosongkan; hanya tanggal surat yang terisi tanggal hari ini.
-export function newLetterDataFromLatest(_value: unknown): LetterData {
-  const data = Object.fromEntries(Object.keys(initialLetterData).map((key) => [key, ""])) as unknown as LetterData;
-  const now = new Date();
-  data.issueDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+const inheritedFields = ["bases", "duties", "city", "authority", "office", "signer", "signerRank", "copyTo"] as const;
+
+export function newLetterDataFromLatest(value: unknown): LetterData {
+  const data = { ...initialLetterData };
+  if (!value || typeof value !== "object" || Array.isArray(value)) return data;
+  const latest = value as Record<string, unknown>;
+  for (const key of inheritedFields) {
+    const saved = latest[key];
+    if (typeof saved === "string") data[key] = saved;
+  }
   return data;
 }
 
