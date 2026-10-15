@@ -29,7 +29,19 @@ export type LetterData = {
   signer: string;
   signerRank: string;
   copyTo: string;
+  bidang: string;
 };
+
+export const BIDANG_OPTIONS = [
+  "Kasat",
+  "Urbinopsnal",
+  "Urmintu",
+  "Uryanmin",
+  "Unit 1 (Politik)",
+  "Unit 2 (Ekonomi)",
+  "Unit 3 (Sosbud)",
+  "Unit 4 (Keamanan)",
+];
 
 export type SuratRecord = {
   id: string;
@@ -68,6 +80,7 @@ export const initialLetterData: LetterData = {
   signer: "MOHAMAD DJUPRI",
   signerRank: "INSPEKTUR POLISI SATU NRP 68020388",
   copyTo: "Kapolres Situbondo.",
+  bidang: "",
 };
 
 const ROMAWI = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
